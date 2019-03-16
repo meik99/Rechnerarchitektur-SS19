@@ -1,0 +1,59 @@
+0x000000AC -> 3b 2b f1 aa
+ 
+0x000000A8 -> c2 c3 0e 00
+
+(a) Little Endian
+
+lw $t0, 0xAC($0)
+
+# Load word (4 Byte) from 0xAC starting at offset 0
+# $t0 = 0x3b2bf1aa ( 0d992735658 )
+
+lb $t1, 0xA9($0)
+
+# Load byte (1 Byte) from 0xA8 at offset 0 (First byte of 0xA8)
+# $t1 = 0x00 (0d0)
+
+sll $t1, $t1, 8
+
+# Shift $t1 by 8 bits to the left
+# $t1 = 0
+
+ori $t1, $t1, 1
+
+# $t1 = $t1 | 1
+# $t1 = 0b 0000 0000 | 0b 0000 0001
+# $t1 = 0d1
+
+xor $t2, $t0, $t1
+
+# $t2 = $t0 xor $t1
+# $t2 = 0x3b2bf1ab
+
+(b) Big Endian
+
+lw $t0, 0xAC($0)
+
+# Load word (4 Byte) from 0xAC starting at offset 0
+# $t0 = 0x3b2bf1aa ( 0d992735658 )
+
+lb $t1, 0xA9($0)
+
+# Load byte (1 Byte) from 0xA8 at offset 0 (First byte of 0xA8)
+# $t1 = 0xc2 (0d194)
+
+sll $t1, $t1, 8
+
+# Shift $t1 by 8 bits to the left
+# $t1 = 0
+
+ori $t1, $t1, 1
+
+# $t1 = $t1 | 1
+# $t1 = 0b 0000 0000 | 0b 0000 0001
+# $t1 = 0d1
+
+xor $t2, $t0, $t1
+
+# $t2 = $t0 xor $t1
+# $t2 = 0x3b2bf1ab

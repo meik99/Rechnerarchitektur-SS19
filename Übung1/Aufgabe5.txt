@@ -1,0 +1,36 @@
+Da < n gesucht n um 1 reduzieren:
+
+n = n - 1
+
+Alle Vielfachen von 3:
+
+Wieviele Vielfache von 3 sind in n enthalten?
+
+n / 3 = n1
+
+Vielfache aufsummieren
+
+((n1*(n1+1))/2) * 3 = s1
+
+Alle Vielfachen von 5:
+
+Wieviele Vielfache von 5 sind in n enthalten?
+
+n / 5 = n2
+
+Vielfache aufsummieren
+
+((n2*(n2+1))/2) * 5 = s2
+
+Wieviele Vielfache von 3 und 5 sind enthalten?
+(Diese würden doppelt summiert werden)
+
+n / 15 = n3
+
+Vielfache aufsummieren
+
+((n3 * (n3 + 1)) / 2) * 15 = s3
+
+Summe berechnen:
+
+s1 + s2 - s3 = Summe aller Vielfachen von 3 oder 5 von 1 bis < n

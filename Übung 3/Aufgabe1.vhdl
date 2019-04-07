@@ -1,172 +1,314 @@
+
+
+-- Start Full Adder
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+
+entity FA is
+  port(
+    a, b, cin: in STD_LOGIC;
+    cout, s: out STD_LOGIC
+  );
+end FA;
+
+architecture behaviour of FA is
+begin
+  s <= a xor b xor cin;
+  cout <= (a and b) or (b and cin) or (a and cin);
+end behaviour ;
+
+-- End Full Adder
+
+-- Start 2to1 Mux
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+
+entity TwoToOneMux is
+  port(
+    a, b, sel: in STD_LOGIC;
+    s: out STD_LOGIC
+  );
+end TwoToOneMux;
+
+architecture behaviour of TwoToOneMux is
+begin
+  s <= (a and not sel) or (b and sel);
+end behaviour;
+
+-- End 2to1 Mux
+
+-- Start 4to2 Mux
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+
+entity FourToTwoMux is
+  port(
+    a, b, x, y, sel: in STD_LOGIC;
+    s, c: out STD_LOGIC
+  );
+end FourToTwoMux;
+
+architecture behaviour of FourToTwoMux is
+  component TwoToOneMux
+  port(
+    a, b, sel: in STD_LOGIC;
+    s: out STD_LOGIC
+  );
+  end component;
+begin
+  mux0: TwoToOneMux
+  port map(a => a, b => b, sel => sel, s => s);
+
+  mux1: TwoToOneMux
+  port map(a => x, b => y, sel => sel, s => c);
+end behaviour;
+-- End 4to2 Mux
+
+-- Start CAS2Bit
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+
+entity CAS2Bit is
+  port(
+    a, b: in std_logic_vector(1 downto 0);
+    cin: in std_logic;
+    sum: out std_logic_vector(1 downto 0);
+    cout: out std_logic
+  );
+end CAS2Bit;
+
+architecture behaviour of CAS2Bit is
+  component FA
+    port(
+      a, b, cin: in STD_LOGIC;
+      cout, s: out STD_LOGIC
+    );
+  end component;
+  component FourToTwoMux
+    port(
+      a, b, x, y, sel: in STD_LOGIC;
+      s, c: out STD_LOGIC
+    );
+  end component;
+
+  signal s0, c0, s1, c1: std_logic_vector(1 downto 0);
+  signal carry: std_logic;
+begin
+  fa0_0: FA
+  port map(a => a(0), b => b(0), cin => '0', s => s0(0), cout => c0(0));
+
+  fa0_1: FA
+  port map(a => a(0), b => b(0), cin => '1', s => s1(0), cout => c1(0));
+
+  fa1_0: FA
+  port map(a => a(1), b => b(1), cin => '0', s => s0(1), cout => c0(1));
+
+  fa1_1: FA
+  port map(a => a(1), b => b(1), cin => '1', s => s1(1), cout => c1(1));
+
+  mux0: FourToTwoMux
+  port map(a => s0(0), b => s1(0), x => c0(0), y => c1(0), sel => cin, s => sum(0), c => carry);
+
+  mux1: FourToTwoMux
+  port map(a => s0(1), b => s1(1), x => c0(1), y => c1(1), sel => carry, s => sum(1), c => cout);
+end behaviour ; -- behaviour
+-- End CAS2Bit
+
+-- Start SixToThreeMux
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+
+entity SixToThreeMux is
+  port(
+    a, b: in std_logic_vector(1 downto 0);
+    c0, c1: in std_logic;
+    s: out std_logic_vector(1 downto 0);
+    c: out std_logic;
+    sel: in std_logic
+  );
+end SixToThreeMux;
+
+architecture behaviour of SixToThreeMux is 
+  component FourToTwoMux
+    port(
+      a, b, x, y, sel: in STD_LOGIC;
+      s, c: out STD_LOGIC
+    );
+  end component;
+  component TwoToOneMux
+    port(
+      a, b, sel: in STD_LOGIC;
+      s: out STD_LOGIC
+    );
+  end component;
+begin
+  mux0: FourToTwoMux
+  port map(a => a(0), b => b(0), x => a(1), y => b(1), sel => sel, s => s(0), c => s(1));
+
+  mux1: TwoToOneMux
+  port map(a => c0, b => c1, sel => sel, s => c);
+end behaviour ; -- behaviour
+-- End SixToThreeMux
+
+-- Start TenToFiveMux
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+
+entity TenToFiveMux is
+  port(
+    a, b: in std_logic_vector(3 downto 0);
+    x, y: in std_logic;
+    s: out std_logic_vector(3 downto 0);
+    c: out std_logic;
+    sel: in std_logic
+  );
+end TenToFiveMux;
+
+architecture behaviour of TenToFiveMux is
+  component TwoToOneMux
+  port(
+    a, b, sel: in STD_LOGIC;
+    s: out STD_LOGIC
+  );
+  end component;
+begin
+  mux0: TwoToOneMux
+  port map(a => a(0), b => b(0), sel => sel, s => s(0));
+  
+  mux1: TwoToOneMux
+  port map(a => a(1), b => b(1), sel => sel, s => s(1));
+
+  mux2: TwoToOneMux
+  port map(a => a(2), b => b(2), sel => sel, s => s(2));
+
+  mux3: TwoToOneMux
+  port map(a => a(3), b => b(3), sel => sel, s => s(3));
+
+  mux_c: TwoToOneMux
+  port map(a => x, b => y, sel => sel, s => c);
+end behaviour ; -- behaviour
+-- End TenToFiveMux
+
+-- Start CAS4Bit
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+
+entity CAS4Bit is
+  port(
+    a, b: in std_logic_vector(3 downto 0);
+    cin: in std_logic;
+    sum: out std_logic_vector(3 downto 0);
+    cout: out std_logic
+  );
+end CAS4Bit;
+
+architecture behaviour of CAS4Bit is
+  component CAS2Bit
+    port(
+      a, b: in std_logic_vector(1 downto 0);
+      cin: in std_logic;
+      sum: out std_logic_vector(1 downto 0);
+      cout: out std_logic
+    );
+  end component;
+  component FourToTwoMux
+    port(
+      a, b, x, y, sel: in STD_LOGIC;
+      s, c: out STD_LOGIC
+    );
+  end component;
+  component SixToThreeMux
+    port(
+      a, b: in std_logic_vector(1 downto 0);
+      c0, c1: in std_logic;
+      s: out std_logic_vector(1 downto 0);
+      c: out std_logic;
+      sel: in std_logic
+    );
+  end component;
+  signal s0_0, s0_1, s1_0, s1_1: std_logic_vector(1 downto 0);
+  signal c0, c1: std_logic_vector(1 downto 0);
+  signal carry: std_logic;
+begin
+
+  cas20_0: CAS2Bit
+  port map(a => a(1 downto 0), b => b(1 downto 0), cin => '0', sum => s0_0, cout => c0(0));
+
+  cas20_1: CAS2Bit
+  port map(a => a(1 downto 0), b => b(1 downto 0), cin => '1', sum => s0_1, cout => c1(0));
+
+  cas21_0: CAS2Bit
+  port map(a => a(3 downto 2), b => b(3 downto 2), cin => '0', sum => s1_0, cout => c0(1));
+
+  cas22_1: CAS2Bit
+  port map(a => a(3 downto 2), b => b(3 downto 2), cin => '1', sum => s1_1, cout => c1(1));
+
+  mux0: SixToThreeMux
+  port map(a => s0_0, b => s0_1, c0 => c0(0), c1 => c1(0), s => sum(1 downto 0), c => carry, sel => cin);
+
+  mux1: SixToThreeMux
+  port map(a => s1_0, b => s1_1, c0 => c0(1), c1 => c1(1), s => sum(3 downto 2), c => cout, sel => carry);
+end behaviour ; -- behaviout
+-- End CAS4Bit
+
 -- Conditional Sum Adder for 8 BITS
 
-library IEEE; use IEEE.STD_LOGIC_1164.all;
+library IEEE; 
+use IEEE.STD_LOGIC_1164.all;
+
 entity adder is
   port(a,b:  in STD_LOGIC_VECTOR(7 downto 0);
        cin:  in STD_LOGIC;
  	   cout: out STD_LOGIC;
        sum:  out STD_LOGIC_VECTOR(7 downto 0));
 end;
+
 architecture behaviour of adder is
-     component CSA4 is
-         port(a,b:  in STD_LOGIC_VECTOR(3 downto 0);
-               cin:  in STD_LOGIC;
-               cout: out STD_LOGIC;
-               sum:  out STD_LOGIC_VECTOR(3 downto 0));
-     end component CSA4;
-     component MUX105 is
-            port(sel : in STD_LOGIC;
-                 X, Y : in STD_LOGIC_VECTOR(4 downto 0);
-                 m: out STD_LOGIC_VECTOR(4 downto 0));
-     end component MUX105;
+  component CAS4Bit
+    port(
+      a, b: in std_logic_vector(3 downto 0);
+      cin: in std_logic;
+      sum: out std_logic_vector(3 downto 0);
+      cout: out std_logic
+    );
+  end component;
+  component TenToFiveMux
+    port(
+      a, b: in std_logic_vector(3 downto 0);
+      x, y: in std_logic;
+      s: out std_logic_vector(3 downto 0);
+      c: out std_logic;
+      sel: in std_logic
+    );
+  end component;
 
-     signal coutCsa1 : STD_LOGIC;
-     signal resultCsa2 : STD_LOGIC_VECTOR(4 downto 0);
-     signal resultCsa3 : STD_LOGIC_VECTOR(4 downto 0);
-     signal rssum : STD_LOGIC_VECTOR(4 downto 0);
+  signal s0_0, s0_1, s1_0, s1_1: std_logic_vector(3 downto 0);
+  signal c0, c1: std_logic_vector(1 downto 0);  
+  signal carry: std_logic;
 begin
-    ca1 : CSA4 port map(a(3 downto 0),b(3 downto 0), cin, coutCsa1, sum(3 downto 0));
-    ca2 : CSA4 port map(a(7 downto 4),b(7 downto 4), '0', resultCsa2(4), resultCsa2(3 downto 0));
-    ca3 : CSA4 port map(a(7 downto 4),b(7 downto 4), '1', resultCsa3(4), resultCsa3(3 downto 0));
-    mux : MUX105 port map(coutCsa1, resultCsa2, resultCsa3,rssum);
-    cout <= rssum(4);
-    sum(7 downto 4) <= rssum(3 downto 0);
-end architecture behaviour;
+  cas40_0: CAS4Bit
+  port map( a => a(3 downto 0), b => b(3 downto 0), cin => '0', sum =>  s0_0, cout => c0(0));
 
--- Conditional Sum Adder for 4 BITS
+  cas40_1: CAS4Bit
+  port map( a => a(3 downto 0), b => b(3 downto 0), cin => '1', sum =>  s0_1, cout => c1(0));
 
-library IEEE; use IEEE.STD_LOGIC_1164.all;
-entity CSA4 is
-  port(a,b:  in STD_LOGIC_VECTOR(3 downto 0);
-       cin:  in STD_LOGIC;
- 	   cout: out STD_LOGIC;
-       sum:  out STD_LOGIC_VECTOR(3 downto 0));
-end;
-architecture behaviour of CSA4 is
-   component CSA2 is
-          port(a,b:  in STD_LOGIC_VECTOR(1 downto 0);
-               cin:  in STD_LOGIC;
-               cout: out STD_LOGIC;
-               sum:  out STD_LOGIC_VECTOR(1 downto 0));
-   end component CSA2;
-   component MUX63 is
-          port(sel : in STD_LOGIC;
-                 X, Y : in STD_LOGIC_VECTOR(2 downto 0);
-                 m: out STD_LOGIC_VECTOR(2 downto 0));
-   end component MUX63;
+  cas41_0: CAS4Bit
+  port map( a => a(7 downto 4), b => b(7 downto 4), cin => '0', sum =>  s1_0, cout => c0(1));
 
-   signal coutCsa1 : STD_LOGIC;
-   signal resultCsa2 : STD_LOGIC_VECTOR(2 downto 0);
-   signal resultCsa3 : STD_LOGIC_VECTOR(2 downto 0);
-   signal tmpSum : STD_LOGIC_VECTOR(2 downto 0);
-begin
-    ca1 : CSA2 port map(a(1 downto 0),b(1 downto 0), cin, coutCsa1, sum(1 downto 0));
-    ca2 : CSA2 port map(a(3 downto 2),b(3 downto 2), '0', resultCsa2(2), resultCsa2(1 downto 0));
-    ca3 : CSA2 port map(a(3 downto 2),b(3 downto 2), '1', resultCsa3(2), resultCsa3(1 downto 0));
-    mux : MUX63 port map(coutCsa1, resultCsa2, resultCsa3,tmpSum);
-    cout <= tmpSum(2);
-    sum(3 downto 2) <= tmpSum(1 downto 0);
-end architecture behaviour;
+  cas41_1: CAS4Bit
+  port map( a => a(7 downto 4), b => b(7 downto 4), cin => '1', sum =>  s1_1, cout => c1(1));
 
--- Conditional Sum Adder for 2 BITS
+  mux0:TenToFiveMux
+  port map(a => s0_0, b => s0_1, x => c0(0), y => c1(0), s => sum(3 downto 0), c => carry, sel => cin);
 
-library IEEE; use IEEE.STD_LOGIC_1164.all;
-entity CSA2 is
-  port(a,b:  in STD_LOGIC_VECTOR(1 downto 0);
-       cin:  in STD_LOGIC;
- 	   cout: out STD_LOGIC;
-       sum:  out STD_LOGIC_VECTOR(1 downto 0));
-end;
-architecture behaviour of CSA2 is
-    component FA is
-            port(a,b,cin: in STD_LOGIC;
-               cout, s: out STD_LOGIC);
-    end component FA;
-    component MUX42 is
-            port(sel, X0, X1, Y0, Y1 : in STD_LOGIC;
-                      m0, m1: out STD_LOGIC);
-    end component MUX42;
+  mux1:TenToFiveMux
+  port map(a => s1_0, b => s1_1, x => c0(1), y => c1(1), s => sum(7 downto 4), c => cout, sel => carry);
+end behaviour ; -- behaviour
 
-    signal coutfa1 : STD_LOGIC;
-    signal sumfa2, coutfa2 : STD_LOGIC;
-    signal sumfa3, coutfa3 : STD_LOGIC;
-begin
-    fa1 : FA port map(a(0), b(0), cin, coutfa1,sum(0));
-    fa2 : FA port map(a(1), b(1), '0', coutfa2,sumfa2);
-    fa3 : FA port map(a(1), b(1), '1', coutfa3,sumfa3);
+-- End CAS8Bit
 
-    mux : MUX42 port map(coutfa1,sumfa2,coutfa2,sumfa3,coutfa3,sum(1),cout);
-end architecture behaviour;
-
--- 10 to 5 Multiplexer
-
-library IEEE; use IEEE.STD_LOGIC_1164.all;
-entity MUX105 is
-    port(sel : in STD_LOGIC;
-         X, Y : in STD_LOGIC_VECTOR(4 downto 0);
-         m: out STD_LOGIC_VECTOR(4 downto 0));
-end;
-architecture behaviour of MUX105 is
-    component MUX63 is
-        port(sel : in STD_LOGIC;
-             X, Y : in STD_LOGIC_VECTOR(2 downto 0);
-             m: out STD_LOGIC_VECTOR(2 downto 0));
-    end component;
-    component MUX42 is
-        port(sel, X0, X1, Y0, Y1 : in STD_LOGIC;
-                m0, m1: out STD_LOGIC);
-    end component;
-begin
-     mu63 : MUX63 port map(sel, X(2 downto 0), Y(2 downto 0), m(2 downto 0));
-     mu42 : MUX42 port map(sel, X(3), X(4), Y(3), Y(4), m(3), m(4));
-end;
-
--- 6 to 3 Multiplexer
-
-library IEEE; use IEEE.STD_LOGIC_1164.all;
-entity MUX63 is
-    port(sel : in STD_LOGIC;
-         X, Y : in STD_LOGIC_VECTOR(2 downto 0);
-         m: out STD_LOGIC_VECTOR(2 downto 0));
-end;
-architecture behaviour of MUX63 is
-    component MUX42 is
-        port(sel, X0, X1, Y0, Y1 : in STD_LOGIC;
-                m0, m1: out STD_LOGIC);
-    end component;
-begin
-     mux : MUX42 port map(sel, X(0), X(1), Y(0), Y(1), m(0), m(1));
-     m(2) <= (X(2) and sel) or (Y(2) and not sel);
-end;
-
--- 4 to 2 Multiplexer
-
-library IEEE; use IEEE.STD_LOGIC_1164.all;
-entity MUX42 is
-    port(sel, X0, X1, Y0, Y1 : in STD_LOGIC;
-           m0, m1: out STD_LOGIC);
-end;
-architecture behaviour of MUX42 is
-begin
-   m0 <= (X0 and sel) or (Y0 and not sel);
-   m1 <= (X1 and sel) or (Y1 and not sel);
-end;
-
-
--- Full Adder
-
-library IEEE; use IEEE.STD_LOGIC_1164.all;
-entity FA is
-  port(a,b,cin: in STD_LOGIC;
-       cout, s: out STD_LOGIC);
-end;
--- Architecture for FA
-library IEEE; use IEEE.STD_LOGIC_1164.all;
-architecture behav of FA is
-begin
-  cout <= (a AND b) OR (a AND cin) OR (b AND cin);
-  s <= a XOR b XOR cin;
-end;
 
 -- Testbench
 

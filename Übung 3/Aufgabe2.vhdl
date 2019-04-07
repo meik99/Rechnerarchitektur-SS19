@@ -17,38 +17,6 @@ begin
 end behaviour ; -- behaviour
 -- End Full Adder
 
--- Start Generator
-library IEEE; use IEEE.STD_LOGIC_1164.all;
-entity Generator is
-  port(
-    a, b: in std_logic;
-    s: out std_logic
-  );
-end Generator;
-
-architecture behaviour of Generator is
-begin
-  s <=a and b;
-end behaviour ; -- behaviour
--- End Generator
-
--- Start Propagator
-library IEEE; use IEEE.STD_LOGIC_1164.all;
-entity Propagator is
-  port (
-    a, b: in std_logic;
-    s: out std_logic
-  );
-end Propagator;
-
-architecture behaviour of Propagator is
-begin
-  s <= a or b;
-end behaviour ; -- behaviour
-
--- End Propagator
-
-
 library IEEE; use IEEE.STD_LOGIC_1164.all; use IEEE.STD_LOGIC_UNSIGNED.all; use IEEE.NUMERIC_STD.all;
 entity adder is
   port(a,b:  in STD_LOGIC_VECTOR(7 downto 0);
@@ -63,18 +31,6 @@ architecture behaviour of adder is
       a, b, cin: in std_logic;    
       s, cout: out std_logic
     );
-  end component;
-  component Generator
-    port(
-      a, b: in std_logic;
-      s: out std_logic
-    );
-  end component;
-  component Propagator
-  port(
-    a, b: in std_logic;
-    s: out std_logic
-  );
   end component;
 
   signal c, g, p: std_logic_vector(7 downto 0);

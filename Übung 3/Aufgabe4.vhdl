@@ -116,7 +116,7 @@ begin
   c(4) <= g(4) or (p(4) and (g(3) or (p(3) and (g(2) or (p(2) and (g(1) or (p(1) and (g(0) or (p(0) and sub)))))))));
   c(5) <= g(5) or (p(5) and (g(4) or (p(4) and (g(3) or (p(3) and (g(2) or (p(2) and (g(1) or (p(1) and (g(0) or (p(0) and sub)))))))))));
   c(6) <= g(6) or (p(6) and (g(5) or (p(5) and (g(4) or (p(4) and (g(3) or (p(3) and (g(2) or (p(2) and (g(1) or (p(1) and (g(0) or (p(0) and sub)))))))))))));
-  cout <= g(7) or (p(7) and (g(6) or (p(6) and (g(5) or (p(5) and (g(4) or (p(4) and (g(3) or (p(3) and (g(2) or (p(2) and (g(1) or (p(1) and (g(0) or (p(0) and sub)))))))))))))));
+  cout <= g(7) or (p(7) and (g(6) or (p(6) and (g(5) or (p(5) and (g(4) or (p(4) and (g(3) or (p(3) and (g(2) or (p(2) and (g(1) or (p(1) and (g(0) or (p(0) and sub)))))))))))))));  
 
   FA0: FA
   port map(a => a(0), b => b_work(0), cin => sub, s => sum(0), cout => open);
@@ -215,7 +215,7 @@ begin
     z <= STD_LOGIC_VECTOR(TO_UNSIGNED(1, z'length));
     x <= STD_LOGIC_VECTOR(TO_UNSIGNED(63, x'length));
     wait for 40 ns;
-    report "1 - 63 = " & integer'image(to_integer(signed(c)));
+    report "1 - 63 = " & to_string(c);
 
     a <= STD_LOGIC_VECTOR(TO_UNSIGNED(19, z'length));
     x <= STD_LOGIC_VECTOR(TO_UNSIGNED(46, x'length));

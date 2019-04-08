@@ -1,11 +1,17 @@
 a) Berechne die Tiefe und die Anzahl der Gatter f¨ur einen n-Bit Conditional Sum
-Addierer für n ∈ 2, 4, 8, 2
+Addierer für n ∈ 2, 4, 8, 2^k
 
+Tiefe: log2(n)
+Kosten: n
 
-???????????
 
 (b) Berechne die Tiefe und die Anzahl der Gatter f¨ur einen n-Bit Carry Lookahead
-Addierer f¨ur n ∈ 2, 4, 8, 2
+Addierer f¨ur n ∈ 2, 4, 8, 2^n
 
 Kosten C(n) = 6n+2n+3n = 11n
 Tiefe D(n) = 4*log(n)–2+4= 4*log(n)+2
+
+(c) Berechne f ̈ur welche n der n-Bit Conditional Sum Addierer 
+schneller ist als der n-Bit Carry Lookahead Addierer.
+
+Ab 4 bit ist der CSA schneller

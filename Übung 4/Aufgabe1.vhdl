@@ -60,19 +60,21 @@ begin
 
 	q <= shiftOutput(width-1);
 
-	process(set)
+	process(clk)
 	begin
-		if set = '1' then
-			inputD <= d(index);
-			index <= index + 1; --- There is a still an issue how to move the number.
-			report "SET " & to_string(d) &  " of " & to_string(d(index)) & " " & to_string(shiftOutput) & " index "  & to_string(index);
-		else
-			index <= 0;
-			inputD <= '0';
-		end if;
-		bumper <= bumper + 1;
+		if clk'event and clk='0' then
+			if set = '1' then
+				inputD <= d(index);
+				report "SETTING: " & to_string(d(index)) & " TO BE TAKEN BY SHIFT REGISTER AT INDEX " & to_string(index) & " CURRENT INPUT: "  & to_string(d) &  " CURRENT OUTPUT: " & to_string(shiftOutput) ;
 
-		report "Bumper " & bumper;
+			
+				index <= index + 1; --- There is a still an issue how to move the number.
+			else
+				index <= 0;
+				inputD <= '0';
+			end if;
+			bumper <= bumper + 1;
+		end if;
 	end process;
 end;
 
@@ -133,7 +135,7 @@ architecture behaviour of serial_adder is
 	signal fullAdderSum : STD_LOGIC;
 	signal carryIn : STD_LOGIC;
 begin
-	shiftA : setable_shift_reg generic map(width => width) port map(clk => clk, d => a, set => set, q => shiftAOuput);
+	--shiftA : setable_shift_reg generic map(width => width) port map(clk => clk, d => a, set => set, q => shiftAOuput);
 	shiftB : setable_shift_reg generic map(width => width) port map(clk => clk, d => b, set => set, q => shiftBOuput);
 
 	fullAdder : FA port map (a => shiftAOuput, b => shiftBOuput, cin => carryIn, cout => cout, sum => fullAdderSum);

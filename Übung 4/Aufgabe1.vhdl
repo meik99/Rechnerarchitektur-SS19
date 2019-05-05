@@ -28,10 +28,6 @@ begin
             q <= '0';
 		elsif clk'event and clk='1' then
 			q <= d;
-
-			if d = '1' then
-				report "Schalte " & to_string(d) & " auf Ausgang";
-			end if;
 		end if;
 	end process;
 end;
@@ -44,40 +40,24 @@ port(clk, set: in STD_LOGIC;
 	 q: out STD_LOGIC);
 end;
 architecture behaviour of setable_shift_reg is
-	component shift_reg generic(width: integer);
-		port(clk: in STD_LOGIC;
+	component ff
+	port(clk, reset: in STD_LOGIC;
 		d: in STD_LOGIC;
-		q: out STD_LOGIC_VECTOR(width-1 downto 0));
+		q: out STD_LOGIC);
 	end component;
-	signal inputD : STD_LOGIC;
-	signal index : integer := 0;
-	signal bumper : integer := 0;
+	signal inputCache: STD_LOGIC_VECTOR(width-1 downto 0);
 	signal shiftOutput : STD_LOGIC_VECTOR(width-1 downto 0);
 begin
+	inputCache(0) <= d(0) when set = '1' else '0';
+	register0: ff port map(clk => clk, reset => '0', d => inputCache(0), q => shiftOutput(0));
 
-
-	shift : shift_reg generic map(width => width) port map(clk => clk, d => inputD, q => shiftOutput);
+	generateRegisters : for i in 1 to (width-1) generate
+		inputCache(i) <= d(i) when set = '1' else shiftOutput(i-1);
+		registerN: ff port map(clk => clk, reset => '0', d => inputCache(i), q => shiftOutput(i));
+	end generate generateRegisters;
 
 	q <= shiftOutput(width-1);
-
-	process(clk)
-	begin
-		if clk'event and clk='0' then
-			if set = '1' then
-				inputD <= d(index);
-				report "SETTING: " & to_string(d(index)) & " TO BE TAKEN BY SHIFT REGISTER AT INDEX " & to_string(index) & " CURRENT INPUT: "  & to_string(d) &  " CURRENT OUTPUT: " & to_string(shiftOutput) ;
-
-			
-				index <= index + 1; --- There is a still an issue how to move the number.
-			else
-				index <= 0;
-				inputD <= '0';
-			end if;
-			bumper <= bumper + 1;
-		end if;
-	end process;
 end;
-
 
 library IEEE; use IEEE.STD_LOGIC_1164.all;
 
@@ -94,10 +74,10 @@ architecture behaviour of shift_reg is
 	end component;
 	signal reset : STD_LOGIC;
 begin
-	register1: ff port map(clk => clk, reset => reset, d => d, q => q(0));
+	register1: ff port map(clk => clk, reset => '0', d => d, q => q(0));
 
 	generateRegisters : for i in 1 to (width-1) generate
-		registerN: ff port map(clk => clk, reset => reset, d => q(i-1), q => q(i));
+		registerN: ff port map(clk => clk, reset => '0', d => q(i-1), q => q(i));
 	end generate generateRegisters;
 end;
 
@@ -135,7 +115,7 @@ architecture behaviour of serial_adder is
 	signal fullAdderSum : STD_LOGIC;
 	signal carryIn : STD_LOGIC;
 begin
-	--shiftA : setable_shift_reg generic map(width => width) port map(clk => clk, d => a, set => set, q => shiftAOuput);
+	shiftA : setable_shift_reg generic map(width => width) port map(clk => clk, d => a, set => set, q => shiftAOuput);
 	shiftB : setable_shift_reg generic map(width => width) port map(clk => clk, d => b, set => set, q => shiftBOuput);
 
 	fullAdder : FA port map (a => shiftAOuput, b => shiftBOuput, cin => carryIn, cout => cout, sum => fullAdderSum);

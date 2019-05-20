@@ -1,0 +1,24 @@
+Assoziativität ist nicht gegeben:
+    Durch die Anpassung des kleineren Exponenten kann eine Zahl von einer
+    anderen "absorbiert" werden. Die Reihenfolge einer Addition ist daher
+    wichtig. 
+    Z.B.: 
+    a   +   b    +  c
+    0,1 + 0,0001 + 0,01 (Zahlen in Dezimaldarstellung)
+
+    (0,1 + 0,0001) + 0,01:
+        (Matissen in basis 2, Exponenten in basis 10)
+        + (1,000) * 2^(-1) + (+(1,000)) * 2 ^ (-4) =
+        + (1,000) * 2^(-1) + (+(0,000)) * 2^(-1)   => b wird "absorbiert"
+    
+    0,1 + (0,0001 + 0,01):
+        + (1,000) * 2^(-4) + (+(1,000)) * 2^(-2) =
+        + (0,010) * 2^(-2) + (+(1,000)) * 2^(-2) => b bleibt erhalten
+
+Kommutativität gilt, da immer die Zahl mit dem kleinsten Exponent angepasst wird => a + b = b + a
+
+    + (1,000) * 2^(-4) + (+(1,000) * 2^(-2)) =
+    + (0,010) * 2^(-2) + (+(1,000) * 2^(-2)) = + (1,010) * 2(-2)
+
+    + (1,000) * 2^(-2) + (+(1,000)) * 2^(-4) =
+    + (1,000) * 2^(-2) + (+(0,010)) * 2^(-2) = + (1,010) * 2(-2)

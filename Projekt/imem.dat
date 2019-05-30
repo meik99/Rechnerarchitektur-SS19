@@ -1,9 +1,9 @@
-3c041001 - la   $a0, str      - 001111 00000 00100 0001000000000001   - ?TYPE(Op code, Empty, R4, 4096) // TODO: Replace 4096 with string address
-0c10000e - jal 0x00400038     - 000011 00000100000000000000001110     - JTYPE(Op code, 26 Bit Address) // TODO: Replace address with relative address to main.
+3c041001 - addi $4, $0, 256   - 001000 00000 00100 0000000100000000   - ITYPE(Op code, R0, R4, Number 256) // Load address 0x100 (256) into R4. Address 0.
+0c10000e - jal 0x5            - 000011 00000100000000000000000101     - JTYPE(Op code, 26 Bit Address) // Jump to address 5.
 00408020 - add $16, $2, $0    - 000000 00010 00000 10000 00000 100000 - RTYPE(Op code=0, R2, R0, R16, 0 SHIFT, Op-Function)
 2002000a - addi $2, $0, 10    - 001000 00000 00010 0000000000001010   - ITYPE(Op code, R0, R2, Number 10)
 0000000c - syscall            - 00000000000000000000000000001100      - SYSTEMCALL OP code.
-23bdfffc - addi $29, $29, -4  - 001000 11101 11101 1111111111111100   - ITYPE(Op code, R29, R29, 2er Complement 4)
+23bdfffc - addi $29, $29, -4  - 001000 11101 11101 1111111111111100   - ITYPE(Op code, R29, R29, 2er Complement 4) // Address 5.
 afbe0000 - sw $30, 0($29)     - 101011 11101 11110 0000000000000000   - ITYPE(Op code, R29, R30, 0)
 23be0004 - addi $30, $29, 4   - 001000 11101 11110 0000000000000100   - ITYPE(Op code, R29, R30, Number 4)
 20080000 - addi $8, $0, 0     - 001000 00000 01000 0000000000000000   - ITYPE(Op code, R0, R8, Number 0)

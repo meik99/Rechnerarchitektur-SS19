@@ -1,0 +1,14 @@
+v 4
+file . "Aufgabe1.vhdl" "70373a821c50d11232b2b96aaf13f5305afafd22" "20190507170808.843":
+  entity fa at 1( 0) + 0 on 11;
+  architecture behav of fa at 8( 127) + 0 on 12;
+  entity ff at 15( 243) + 0 on 13;
+  architecture asynchronous of ff at 23( 380) + 0 on 14;
+  entity setable_shift_reg at 35( 569) + 0 on 15;
+  architecture behaviour of setable_shift_reg at 42( 768) + 0 on 16;
+  entity shift_reg at 62( 1455) + 0 on 17;
+  architecture behaviour of shift_reg at 69( 1641) + 0 on 18;
+  entity serial_adder at 84( 2055) + 0 on 19;
+  architecture behaviour of serial_adder at 92( 2299) + 0 on 20;
+  entity testbench at 127( 3524) + 0 on 21;
+  architecture test of testbench at 131( 3619) + 0 on 22;

@@ -1,0 +1,59 @@
+$date
+  Mon May  6 12:50:16 2019
+$end
+$version
+  GHDL v0
+$end
+$timescale
+  1 fs
+$end
+$scope module standard $end
+$upscope $end
+$scope module std_logic_1164 $end
+$upscope $end
+$scope module std_logic_arith $end
+$upscope $end
+$scope module std_logic_unsigned $end
+$upscope $end
+$scope module numeric_std $end
+$upscope $end
+$scope module not_b_testbench $end
+$var reg 32 ! a[31:0] $end
+$var reg 32 " b[31:0] $end
+$var reg 32 # y[31:0] $end
+$var reg 3 $ f[2:0] $end
+$scope module notifier0 $end
+$var reg 32 % b[31:0] $end
+$var reg 3 & f[2:0] $end
+$var reg 32 ' result[31:0] $end
+$var reg 32 ( not_b[31:0] $end
+$scope module mux0 $end
+$var reg 32 ) a[31:0] $end
+$var reg 32 * b[31:0] $end
+$var reg 1 + sig $end
+$var reg 32 , result[31:0] $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+b00000000000000000000000000010001 !
+b00000000000000000000000000011010 "
+b00000000000000000000000000011010 #
+b000 $
+b00000000000000000000000000011010 %
+b000 &
+b00000000000000000000000000011010 '
+b11111111111111111111111111100101 (
+b00000000000000000000000000011010 )
+b11111111111111111111111111100101 *
+0+
+b00000000000000000000000000011010 ,
+#40000000
+b11111111111111111111111111100101 #
+b100 $
+b100 &
+b11111111111111111111111111100101 '
+1+
+b11111111111111111111111111100101 ,
+#80000000

@@ -49,11 +49,11 @@ architecture behaviour of setable_shift_reg is
 	signal shiftOutput : STD_LOGIC_VECTOR(width-1 downto 0);
 begin
 	inputCache(0) <= d(0) when set = '1' else '0';
-	register0: ff port map(clk => clk, reset => '0', d => inputCache(0), q => shiftOutput(0));
+	register0: ff port map(clk => clk, reset => set, d => inputCache(0), q => shiftOutput(0));
 
 	generateRegisters : for i in 1 to (width-1) generate
 		inputCache(i) <= d(i) when set = '1' else shiftOutput(i-1);
-		registerN: ff port map(clk => clk, reset => '0', d => inputCache(i), q => shiftOutput(i));
+		registerN: ff port map(clk => clk, reset => set, d => inputCache(i), q => shiftOutput(i));
 	end generate generateRegisters;
 
 	q <= shiftOutput(width-1);
@@ -119,7 +119,7 @@ begin
 	shiftB : setable_shift_reg generic map(width => width) port map(clk => clk, d => b, set => set, q => shiftBOuput);
 
 	fullAdder : FA port map (a => shiftAOuput, b => shiftBOuput, cin => carryIn, cout => cout, sum => fullAdderSum);
-	carryRegister : ff port map (clk => clk, reset => '0', d => cout, q => carryIn);
+	carryRegister : ff port map (clk => clk, reset => set, d => cout, q => carryIn);
 
 	shiftSum : shift_reg generic map(width => width) port map(clk => clk, d => fullAdderSum, q => sum);
 end;

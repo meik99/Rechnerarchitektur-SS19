@@ -1,0 +1,28 @@
+Sqeuenziell:
+
+	Setup:	DS:	50ps
+			RB:	45ps
+			R:	40ps
+			
+	PCQ:	DS:	40ps
+			RB:	40ps
+			R:	40
+	
+	Setup = 135ps
+	PCQ = 170ps
+
+	Clockspeed mit setup:	8,3 GHz
+	Clockspeed ohne setup:	8,3 GHz
+	
+Kombinatorisch:
+	Instruktion:	250ps
+	Register:		140ps
+	ALU:			175ps
+	Datenspeicher:	220ps
+	2 Addierer:		250ps
+	5 2:1 Mux:		150ps
+	UND Gatter:		20ps
+	
+	= 1115ps => 896,86MHz
+
+	

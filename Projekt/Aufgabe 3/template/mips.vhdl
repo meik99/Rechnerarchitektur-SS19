@@ -59,18 +59,18 @@ begin
                     when "100101" => controls <= "1000000010"; -- OR
                     when "101010" => controls <= "1110000010"; -- SLT
                     when "001000" => controls <= "0111000000"; -- JR
-                    when others   => controls <= "011-------";
+                    when others   => controls <= "----------";
                 end case;
-            when "100011" => controls <= "---0------"; -- LW
-            when "100000" => controls <= "---0------"; -- LB
-            when "101011" => controls <= "---0------"; -- SW
-            when "101000" => controls <= "---0------"; -- SB
-            when "000100" => controls <= "---0------"; -- BEQ
-            when "000101" => controls <= "---0------"; -- BNE
-            when "001000" => controls <= "---0------"; -- ADDI
-            when "001010" => controls <= "---0------"; -- SLTI
-            when "000010" => controls <= "---1------"; -- J
-            when "000011" => controls <= "---1------"; -- JAL
+            when "100011" => controls <= "0100000011"; -- LW
+            when "100000" => controls <= "0100000011"; -- LB
+            when "101011" => controls <= "0100010100"; -- SW
+            when "101000" => controls <= "0100010100"; -- SB
+            when "000100" => controls <= "1100001000"; -- BEQ
+            when "000101" => controls <= "1100001000"; -- BNE
+            when "001000" => controls <= "0000000101"; -- ADDI
+            when "001010" => controls <= "1110000101"; -- SLTI
+            when "000010" => controls <= "0001000000"; -- J
+            when "000011" => controls <= "0001000000"; -- JAL
             when others   => controls <= "----------"; -- illegal op
         end case;
     end process;

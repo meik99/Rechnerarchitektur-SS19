@@ -1,0 +1,58 @@
+Sequentiell
+	2-1 Mux: 50ps
+
+	Instruktionsspeicher: 250ps
+
+	Parallel: 30ps
+		CU: 0ps
+		2-1 Mux: 30ps
+		2-1 Mux: 30ps
+		
+	Register: 40ps
+
+	Parallel: 50ps
+		2-1 Mux: 30ps
+		4-1 Mux: 50ps
+
+	ALU:	175ps
+
+	4-1 Mux:	50ps
+
+	Zeit pro Takt: 
+		50 + 250 + 30 + 40 + 50 + 175 + 50 = 645ps
+
+	Takt pro Sekunde: 
+		1550387596.9 Hz = 
+		1550387,596 KHz = 
+		1550,387 MHz = 
+		1,550 GHz
+		
+Kombinatorisch:
+	Parallel: 250ps
+		Instruction Memory: 250ps
+		Addierer: 125ps
+	
+	Register File: 140ps
+	
+	2-1 Mux: 30ps
+	
+	ALU: 175ps
+	
+	Data Memory: 220ps
+	
+	2-1 Mux:	30ps
+	
+	2-1 Mux:	30ps
+	
+	2-1 Mux:	30ps
+	
+	Zeit pro Takt:
+		250 + 140 + 30 + 175 + 220 + 30 + 30 + 30 = 905ps
+		
+	Takt pro Sekunde:
+		
+		1104972375.69 Hz =
+		1104972,375 KHz = 
+		1104,974 MHz = 
+		1,104 GHz
+		

@@ -9,22 +9,24 @@ architecture struct of mips is
         port(op, funct:             in STD_LOGIC_VECTOR(5 downto 0);
              zero:                  in STD_LOGIC;
              memtoreg, memwrite:    out STD_LOGIC;
-             branchandzero, alusrc:         out STD_LOGIC;
+             branchandzero, alusrc: out STD_LOGIC;
              regdst, regwrite:      out STD_LOGIC;
-             jump:                  out STD_LOGIC;
+             jump:                  out STD_LOGIC_VECTOR(1 downto 0);
              alucontrol:            out STD_LOGIC_VECTOR(2 downto 0));
     end component;
     component datapath
         port(clk, reset:        in STD_LOGIC;
              memtoreg, branchandzero:   in STD_LOGIC;
              alusrc, regdst:    in STD_LOGIC;
-             regwrite, jump:    in STD_LOGIC;
+             regwrite:          in STD_LOGIC;
+             jump:              in STD_LOGIC_VECTOR(1 downto 0);
              memwrite:          in STD_LOGIC;
              alucontrol:        in STD_LOGIC_VECTOR(2 downto 0);
              zero:              out STD_LOGIC;
              instr:             out STD_LOGIC_VECTOR(31 downto 0));
     end component;
-    signal memtoreg, memwrite, branchandzero, alusrc, regdst, regwrite, jump, zero: STD_LOGIC := '0';
+    signal memtoreg, memwrite, branchandzero, alusrc, regdst, regwrite, zero: STD_LOGIC := '0';
+    signal jump: STD_LOGIC_VECTOR(1 downto 0);
     signal alucontrol: STD_LOGIC_VECTOR(2 downto 0) := "000";
     signal instr: STD_LOGIC_VECTOR(31 downto 0);
 begin
@@ -40,7 +42,7 @@ entity controller is
          memtoreg, memwrite:    out STD_LOGIC;
          branchandzero, alusrc: out STD_LOGIC;
          regdst, regwrite:      out STD_LOGIC;
-         jump:		            out STD_LOGIC;
+         jump:		            out STD_LOGIC_VECTOR(1 downto 0);
          alucontrol:            out STD_LOGIC_VECTOR(2 downto 0));
 end;
 
@@ -81,7 +83,7 @@ begin
     branch       <= controls(6);
     memwrite     <= controls(5);
     memtoreg     <= controls(4);
-    jump         <= controls(3);
+    jump         <= controls(3 downto 2); -- TODO: Think again which controls have to be sent.
     alucontrol   <= controls(2 downto 0);
 
     branchandzero <= branch and zero;
@@ -93,7 +95,8 @@ entity datapath is
     port(clk, reset:        in STD_LOGIC;
          memtoreg, branchandzero:   in STD_LOGIC;
          alusrc, regdst:    in STD_LOGIC;
-         regwrite, jump:    in STD_LOGIC;
+         regwrite:          in STD_LOGIC;
+         jump:              in STD_LOGIC_VECTOR(1 downto 0);
          memwrite:          in STD_LOGIC;
          alucontrol:        in STD_LOGIC_VECTOR(2 downto 0);
          zero:              out STD_LOGIC;
@@ -140,6 +143,12 @@ architecture datapath_architecture of datapath is
             s:         in STD_LOGIC;
             y:         out STD_LOGIC_VECTOR(width-1 downto 0));
     end component;  
+    component ff
+        generic(width: integer);
+        port(clk, reset: in STD_LOGIC;
+        d:          in STD_LOGIC_VECTOR(width-1 downto 0);
+        q:          out STD_LOGIC_VECTOR(width-1 downto 0));
+    end component;
     -- The destination register coming from the MUX below the Register File.
     signal destinationreg: STD_LOGIC_VECTOR(4 downto 0);
     -- The result coming from the MUX on the right.
@@ -150,15 +159,35 @@ architecture datapath_architecture of datapath is
     signal srcb : STD_LOGIC_VECTOR(31 downto 0);
     -- The writedata coming from the Register File.
     signal writedata : STD_LOGIC_VECTOR(31 downto 0);
-begin
+    -- The aluresult coming from the ALU.
+    signal aluresult : STD_LOGIC_VECTOR(31 downto 0);
+    -- The readdata coming from the Data Memory.
+    signal readdata : STD_LOGIC_VECTOR(31 downto 0);
+    -- The programm counter coming from the PC flip flop memory.
+    signal pc : STD_LOGIC_VECTOR(31 downto 0);
+    -- The next address coming from the adder below Instruction Memory.
+    signal nextaddress : STD_LOGIC_VECTOR(31 downto 0);
+    -- Output from the MUX2_1.
+    signal mux2_1_output : STD_LOGIC_VECTOR(31 downto 0);
+    -- Output from the MUX4_3.
+    signal mux4_3_output : STD_LOGIC;
+    -- The jump address comin the shifter below.
+    signal jumpaddress : STD_LOGIC_VECTOR(31 downto 0);
+    -- Definition of an null address.
+    signal emptyaddress: STD_LOGIC_VECTOR(31 downto 0);
+begin -- The definitions below are from left to right on the processor sheet.
+    -- MUX2 most left.
+    mux2_1 : mux2 generic map (width => 31) port map(d0 => nextaddress, d1 => result, s => mux4_3_output, y => mux2_1_output);
+    -- MUX4 most left.
+    mux4_1 : mux4 generic map (width => 31) port map(d0 => mux2_1_output, d1 => jumpaddress, d2 => srca, d3 => emptyaddress, s => jump, y => pc);
     -- Register File.
     rf: regfile port map(clk => clk, we3 => regwrite, ra1 => instr(25 downto 21), ra2 => instr(20 downto 16), wa3 => destinationreg, wd3 => result, rd1 => srca, rd2 => writedata);
     -- Data Memory.
-   -- dmem1: dmem port map(clk => clk, we => ?, a => ?, wd => ?, rd => ?);
+    dmem1: dmem port map(clk => clk, we => memwrite, a => aluresult, wd => writedata, rd => readdata);
     -- Instruction Memory.
-   -- imem1: imem port map(a => ?, rd => ?);
+    imem1: imem port map(a => pc, rd => instr);
     -- ALU.
-   -- alu : alu port map(a => ?, b => ? , alucontrol => ?, zero => ?);
+    alu1 : alu port map(a => srca, b => srcb, alucontrol => alucontrol, zero => zero);
 end;
 
 -- testbench

@@ -169,6 +169,8 @@ architecture datapath_architecture of datapath is
     signal nextaddress : STD_LOGIC_VECTOR(31 downto 0);
     -- Output from the MUX2_1.
     signal mux2_1_output : STD_LOGIC_VECTOR(31 downto 0);
+    -- Output from the MUX4_1.
+    signal mux4_1_output : STD_LOGIC_VECTOR(31 downto 0);
     -- Output from the MUX4_3.
     signal mux4_3_output : STD_LOGIC;
     -- The jump address comin the shifter below.
@@ -177,9 +179,11 @@ architecture datapath_architecture of datapath is
     signal emptyaddress: STD_LOGIC_VECTOR(31 downto 0);
 begin -- The definitions below are from left to right on the processor sheet.
     -- MUX2 most left.
-    mux2_1 : mux2 generic map (width => 31) port map(d0 => nextaddress, d1 => result, s => mux4_3_output, y => mux2_1_output);
+    mux2_1 : mux2 generic map (width => 32) port map(d0 => nextaddress, d1 => result, s => mux4_3_output, y => mux2_1_output);
     -- MUX4 most left.
-    mux4_1 : mux4 generic map (width => 31) port map(d0 => mux2_1_output, d1 => jumpaddress, d2 => srca, d3 => emptyaddress, s => jump, y => pc);
+    mux4_1 : mux4 generic map (width => 32) port map(d0 => mux2_1_output, d1 => jumpaddress, d2 => srca, d3 => emptyaddress, s => jump, y => mux4_1_output);
+    -- Programm Counter 31 Bit Flip Flop.
+    pc1 : ff generic map (width => 32) port map(clk => clk, reset => reset, d => mux4_1_output, q => pc);
     -- Register File.
     rf: regfile port map(clk => clk, we3 => regwrite, ra1 => instr(25 downto 21), ra2 => instr(20 downto 16), wa3 => destinationreg, wd3 => result, rd1 => srca, rd2 => writedata);
     -- Data Memory.

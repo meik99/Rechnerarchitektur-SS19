@@ -143,11 +143,25 @@ architecture datapath_architecture of datapath is
             s:         in STD_LOGIC;
             y:         out STD_LOGIC_VECTOR(width-1 downto 0));
     end component;  
-    component ff
+    component ff        -- Component FlipFlop.
         generic(width: integer);
         port(clk, reset: in STD_LOGIC;
         d:          in STD_LOGIC_VECTOR(width-1 downto 0);
         q:          out STD_LOGIC_VECTOR(width-1 downto 0));
+    end component;
+    component adder     -- Component 32 Bit Adder.
+        port(a, b: in STD_LOGIC_VECTOR(31 downto 0);
+            cin: in STD_LOGIC;
+            y:    buffer STD_LOGIC_VECTOR(31 downto 0));
+    end component;
+    component signext   -- Component Sign Extension.
+        generic (width_in, width_out: integer);
+        port(a: in STD_LOGIC_VECTOR(width_in-1  downto 0);
+        y: out STD_LOGIC_VECTOR(width_out-1 downto 0));
+    end component;
+    component sl2    -- Component Shift 2 Left.
+        port(a: in STD_LOGIC_VECTOR(31 downto 0);
+            y: out STD_LOGIC_VECTOR(31 downto 0));
     end component;
     -- The destination register coming from the MUX below the Register File.
     signal destinationreg: STD_LOGIC_VECTOR(4 downto 0);
@@ -173,8 +187,10 @@ architecture datapath_architecture of datapath is
     signal mux4_1_output : STD_LOGIC_VECTOR(31 downto 0);
     -- Output from the MUX4_3.
     signal mux4_3_output : STD_LOGIC;
-    -- The jump address comin the shifter below.
+    -- The jump address coming the shifter below.
     signal jumpaddress : STD_LOGIC_VECTOR(31 downto 0);
+    -- The immediate coming from sign extend below Register File.
+    signal immediate: STD_LOGIC_VECTOR(31 downto 0);
     -- Definition of an null address.
     signal emptyaddress: STD_LOGIC_VECTOR(31 downto 0);
 begin -- The definitions below are from left to right on the processor sheet.
@@ -182,16 +198,25 @@ begin -- The definitions below are from left to right on the processor sheet.
     mux2_1 : mux2 generic map (width => 32) port map(d0 => nextaddress, d1 => result, s => mux4_3_output, y => mux2_1_output);
     -- MUX4 most left.
     mux4_1 : mux4 generic map (width => 32) port map(d0 => mux2_1_output, d1 => jumpaddress, d2 => srca, d3 => emptyaddress, s => jump, y => mux4_1_output);
-    -- Programm Counter 31 Bit Flip Flop.
+    -- Programm Counter 32 Bit Flip Flop.
     pc1 : ff generic map (width => 32) port map(clk => clk, reset => reset, d => mux4_1_output, q => pc);
+    -- Instruction Memory.
+    imem1: imem port map(a => pc, rd => instr);   
+    -- Adder below Instruction Memory.
+    adder1: adder port map(a => pc, b => std_logic_vector(to_unsigned(4, 32)), cin => '0', y => nextaddress);
     -- Register File.
     rf: regfile port map(clk => clk, we3 => regwrite, ra1 => instr(25 downto 21), ra2 => instr(20 downto 16), wa3 => destinationreg, wd3 => result, rd1 => srca, rd2 => writedata);
-    -- Data Memory.
-    dmem1: dmem port map(clk => clk, we => memwrite, a => aluresult, wd => writedata, rd => readdata);
-    -- Instruction Memory.
-    imem1: imem port map(a => pc, rd => instr);
+    -- Sign Extend below Register File.
+    signext1 : signext generic map (width_in => 16, width_out => 32) port map (a => instr(15 downto 0), y => immediate);
+    -- Shift left below Register File.
+    shiftleft1: sl2 port map(a => instr(31 downto 0), y => jumpaddress); -- TODO 31 down to 0 is not right but shift left needs 31 Bits?.
+
+    -- TODO: Continue here from left to write on the processor sheet. Next item is Mux4_2.
+    
     -- ALU.
     alu1 : alu port map(a => srca, b => srcb, alucontrol => alucontrol, zero => zero);
+    -- Data Memory.
+    dmem1: dmem port map(clk => clk, we => memwrite, a => aluresult, wd => writedata, rd => readdata);
 end;
 
 -- testbench

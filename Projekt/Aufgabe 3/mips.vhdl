@@ -191,15 +191,19 @@ architecture datapath_architecture of datapath is
     signal mux4_1_output : STD_LOGIC_VECTOR(31 downto 0);
     -- Output from the MUX4_3.
     signal mux4_3_output : STD_LOGIC;
+    -- Output from the ShiftLeft2.
+    signal shiftLeft2_output : STD_LOGIC_VECTOR(31 downto 0);
     -- The jump address coming the shifter below.
     signal jumpaddress : STD_LOGIC_VECTOR(31 downto 0);
+    -- The branch address coming the adder below.
+    signal branchaddress : STD_LOGIC_VECTOR(31 downto 0);
     -- The immediate coming from sign extend below Register File.
     signal immediate: STD_LOGIC_VECTOR(31 downto 0);
     -- Definition of an null address.
     signal emptyaddress: STD_LOGIC_VECTOR(31 downto 0);
 begin -- The definitions below are from left to right on the processor sheedatapatht.
     -- MUX2 most left.
-    mux2_1 : mux2 generic map (width => 32) port map(d0 => nextaddress, d1 => result, s => mux4_3_output, y => mux2_1_output);
+    mux2_1 : mux2 generic map (width => 32) port map(d0 => nextaddress, d1 => branchaddress, s => mux4_3_output, y => mux2_1_output);
     -- MUX4 most left.
     mux4_1 : mux4 generic map (width => 32) port map(d0 => mux2_1_output, d1 => jumpaddress, d2 => srca, d3 => emptyaddress, s => jump, y => mux4_1_output);
     -- Programm Counter 32 Bit Flip Flop.
@@ -218,12 +222,13 @@ begin -- The definitions below are from left to right on the processor sheedatap
     mux4_2 : mux4 generic map (width => 5) port map(d0 => instr(20 downto 16), d1 => instr(15 downto 11), d2 => std_logic_vector(to_unsigned(31, 5)), d3 => std_logic_vector(to_unsigned(0, 5)), s => regdst, y => destinationreg);
     -- MUX2 right beside Register File.
     mux2_2 : mux2 generic map (width => 32) port map(d0 => writedata, d1 => immediate, s => alusrc, y => srcb);
-
-
-
-    
     -- ALU.
     alu1 : alu port map(a => srca, b => srcb, alucontrol => alucontrol, zero => zero);
+    -- Shift left below ALU.
+    shiftLeft2: signext generic map (width_in => 32, width_out => 32) port map (a => immediate, y => shiftLeft2_output);
+    -- Adder below ALU.
+    adder2: adder port map(a => shiftLeft2_output, b => nextaddress, cin => '0', y => branchaddress);
+
     -- Data Memory.
     dmem1: dmem port map(clk => clk, we => memwrite, a => aluresult, wd => writedata, rd => readdata);
 end;

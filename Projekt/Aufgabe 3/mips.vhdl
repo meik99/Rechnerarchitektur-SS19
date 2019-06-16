@@ -76,7 +76,7 @@ begin
             when "101000" => controls <= "0100010100"; -- SB
             when "000100" => controls <= "1100001000"; -- BEQ
             when "000101" => controls <= "1100010000"; -- BNE
-            when "001000" => controls <= "0000000101"; -- ADDI TODO: Double check.
+            when "001000" => controls <= "1010000000"; -- ADDI TODO: Double check. All controls are the wrong way around exept addi.
             when "001010" => controls <= "1110000101"; -- SLTI
             when "000010" => controls <= "0001000000"; -- J
             when "000011" => controls <= "0010000100"; -- JAL
@@ -239,7 +239,24 @@ begin -- The definitions below are from left to right on the processor sheedatap
     dmem1: dmem port map(clk => clk, we => memwrite, a => aluresult, wd => writedata, rd => readdata);
     -- MUX4 right beside Data Memory.
     mux4_4 : mux4 generic map (width => 32) port map(d0 => aluresult, d1 => readdata, d2 => nextaddress, d3 => std_logic_vector(to_unsigned(0, 32)), s => memtoreg, y => result);   
-end;
+    
+    -- DEBUG Helper. Should be removed before submission.
+    process begin
+        report "Begin ----";
+        report "Instruction: " & to_string(instr);
+        report "ALU: Input[" & to_string(srca) & "/" & to_string(srcb) & "]";
+        report "WriteData: " & to_string(writedata);
+        report "regwrite: " & to_string(regwrite);
+        report "redgst: " & to_string(regdst);
+     --   report "RegDst: " & to_string(regdst);
+   --     report "DesinationReg: " & to_string(destinationreg);
+        report "End ----";
+
+
+        wait for 5 ps;
+    end process;
+
+ end;
 
 -- testbench
 library IEEE; use IEEE.STD_LOGIC_1164.all; use IEEE.NUMERIC_STD.all; use STD.ENV.STOP;

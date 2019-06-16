@@ -75,23 +75,23 @@ begin
             when "101011" => controls <= "0100010100"; -- SW
             when "101000" => controls <= "0100010100"; -- SB
             when "000100" => controls <= "1100001000"; -- BEQ
-            when "000101" => controls <= "1100001000"; -- BNE
-            when "001000" => controls <= "0000000101"; -- ADDI
+            when "000101" => controls <= "1100010000"; -- BNE
+            when "001000" => controls <= "0000000101"; -- ADDI TODO: Double check.
             when "001010" => controls <= "1110000101"; -- SLTI
             when "000010" => controls <= "0001000000"; -- J
-            when "000011" => controls <= "0001000000"; -- JAL
+            when "000011" => controls <= "0010000100"; -- JAL
             when others   => controls <= "----------"; -- illegal op
         end case;
     end process;
 
     regwrite     <= controls(9);
-    regdst       <= controls(8 downto 7); -- TODO: Think again which controls have to be sent.
+    regdst       <= controls(8 downto 7); 
     alusrc       <= controls(7);
-    branch       <= controls(6 downto 5); -- TODO: Think again which controls have to be sent.
+    branch       <= controls(6 downto 5); 
     memwrite     <= controls(5);
-    memtoreg     <= controls(4 downto 3); -- TODO: Think again which controls have to be sent.
-    jump         <= controls(3 downto 2); -- TODO: Think again which controls have to be sent.
-    alucontrol   <= controls(2 downto 0);
+    memtoreg     <= controls(4 downto 3);
+    jump         <= controls(3 downto 2);
+    alucontrol   <= controls(2 downto 0); -- 000-AND, 001-OR, 010-ADD, 110-SUBSTRACT, 111-SETONLESSTHAN.
 end;
 
 -- datapath

@@ -55,42 +55,42 @@ entity controller is
 end;
 
 architecture struct of controller is
-    signal controls: STD_LOGIC_VECTOR(9 downto 0) := "0000000000";
+    signal controls: STD_LOGIC_VECTOR(13 downto 0) := "00000000000000";
 begin    
     process(op, funct) begin
 		-- TODO: Set controll signals accordingly. Use - to denote don't cares and 0 or 1 if the value is fixed.
         case op is
             when "000000" => -- R-Type
                 case funct is
-                    when "100000" => controls <= "0100000010"; -- ADD
-                    when "100010" => controls <= "0110000010"; -- SUB
-                    when "100100" => controls <= "0000000010"; -- AND
-                    when "100101" => controls <= "1000000010"; -- OR
-                    when "101010" => controls <= "1110000010"; -- SLT
-                    when "001000" => controls <= "0111000000"; -- JR
-                    when others   => controls <= "----------";
+                    when "100000" => controls <= "--------------"; -- ADD
+                    when "100010" => controls <= "--------------"; -- SUB
+                    when "100100" => controls <= "--------------"; -- AND
+                    when "100101" => controls <= "--------------"; -- OR
+                    when "101010" => controls <= "--------------"; -- SLT
+                    when "001000" => controls <= "--------------"; -- JR
+                    when others   => controls <= "--------------";
                 end case;
-            when "100011" => controls <= "0100000011"; -- LW
-            when "100000" => controls <= "0100000011"; -- LB
-            when "101011" => controls <= "0100010100"; -- SW
-            when "101000" => controls <= "0100010100"; -- SB
-            when "000100" => controls <= "1100001000"; -- BEQ
-            when "000101" => controls <= "1100010000"; -- BNE
-            when "001000" => controls <= "1010000000"; -- ADDI TODO: Double check. All controls are the wrong way around exept addi.
-            when "001010" => controls <= "1110000101"; -- SLTI
-            when "000010" => controls <= "0001000000"; -- J
-            when "000011" => controls <= "0010000100"; -- JAL
-            when others   => controls <= "----------"; -- illegal op
+            when "100011" => controls <= "--------------"; -- LW
+            when "100000" => controls <= "--------------"; -- LB
+            when "101011" => controls <= "--------------"; -- SW
+            when "101000" => controls <= "--------------"; -- SB
+            when "000100" => controls <= "--------------"; -- BEQ
+            when "000101" => controls <= "--------------"; -- BNE
+            when "001000" => controls <= "10010000000010"; -- ADDI TODO: Double check. All controls are the wrong way around exept addi.
+            when "001010" => controls <= "--------------"; -- SLTI
+            when "000010" => controls <= "--------------"; -- J
+            when "000011" => controls <= "--------------"; -- JAL
+            when others   => controls <= "--------------"; -- illegal op
         end case;
     end process;
 
-    regwrite     <= controls(9);
-    regdst       <= controls(8 downto 7); 
-    alusrc       <= controls(7);
-    branch       <= controls(6 downto 5); 
-    memwrite     <= controls(5);
-    memtoreg     <= controls(4 downto 3);
-    jump         <= controls(3 downto 2);
+    regwrite     <= controls(13);
+    regdst       <= controls(12 downto 11); 
+    alusrc       <= controls(10);
+    branch       <= controls(9 downto 8); 
+    memwrite     <= controls(7);
+    memtoreg     <= controls(6 downto 5);
+    jump         <= controls(4 downto 3);
     alucontrol   <= controls(2 downto 0); -- 000-AND, 001-OR, 010-ADD, 110-SUBSTRACT, 111-SETONLESSTHAN.
 end;
 
@@ -242,18 +242,19 @@ begin -- The definitions below are from left to right on the processor sheedatap
     
     -- DEBUG Helper. Should be removed before submission.
     process begin
-        report "Begin ----";
+        report "Begin #############################################################################################################################################";
         report "Instruction: " & to_string(instr);
-        report "ALU: Input[" & to_string(srca) & "/" & to_string(srcb) & "]";
-        report "WriteData: " & to_string(writedata);
-        report "regwrite: " & to_string(regwrite);
-        report "redgst: " & to_string(regdst);
-     --   report "RegDst: " & to_string(regdst);
+        report "ALU: Input[" & to_string(srca) & "/" & to_string(srcb) & "] Control: " & to_string(alucontrol) & " Result:" & to_string(aluresult);
+        report "RESULT: " & to_string(result) & " into " & to_string(destinationreg) ;
+        -- report "WriteData: " & to_string(writedata);
+        --report "regwrite: " & to_string(regwrite);
+       -- report "redgst: " & to_string(regdst);
+          report "RegDst: " & to_string(regdst) & " " & to_string(instr(15 downto 11));
    --     report "DesinationReg: " & to_string(destinationreg);
-        report "End ----";
+        report "End #############################################################################################################################################";
 
 
-        wait for 5 ps;
+        wait for 250 ps;
     end process;
 
  end;

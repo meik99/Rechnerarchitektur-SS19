@@ -7,26 +7,28 @@ end;
 architecture struct of mips is
     component controller
         port(op, funct:             in STD_LOGIC_VECTOR(5 downto 0);
-             zero:                  in STD_LOGIC;
-             memtoreg, memwrite:    out STD_LOGIC;
-             branchandzero, alusrc: out STD_LOGIC;
-             regdst, regwrite:      out STD_LOGIC;
-             jump:                  out STD_LOGIC_VECTOR(1 downto 0);
-             alucontrol:            out STD_LOGIC_VECTOR(2 downto 0));
+            zero:                  in STD_LOGIC;
+            memtoreg, memwrite:    out STD_LOGIC;
+            branchandzero, alusrc: out STD_LOGIC;
+            regdst:                out STD_LOGIC_VECTOR(1 downto 0);
+            regwrite:              out STD_LOGIC;
+            jump:		            out STD_LOGIC_VECTOR(1 downto 0);
+            alucontrol:            out STD_LOGIC_VECTOR(2 downto 0));
     end component;
     component datapath
         port(clk, reset:        in STD_LOGIC;
-             memtoreg, branchandzero:   in STD_LOGIC;
-             alusrc, regdst:    in STD_LOGIC;
-             regwrite:          in STD_LOGIC;
-             jump:              in STD_LOGIC_VECTOR(1 downto 0);
-             memwrite:          in STD_LOGIC;
-             alucontrol:        in STD_LOGIC_VECTOR(2 downto 0);
-             zero:              out STD_LOGIC;
-             instr:             out STD_LOGIC_VECTOR(31 downto 0));
+            memtoreg, branchandzero:   in STD_LOGIC;
+            alusrc:            in STD_LOGIC;
+            regdst:            in STD_LOGIC_VECTOR(1 downto 0);
+            regwrite:          in STD_LOGIC;
+            jump:              in STD_LOGIC_VECTOR(1 downto 0);
+            memwrite:          in STD_LOGIC;
+            alucontrol:        in STD_LOGIC_VECTOR(2 downto 0);
+            zero:              out STD_LOGIC;
+            instr:             out STD_LOGIC_VECTOR(31 downto 0));
     end component;
-    signal memtoreg, memwrite, branchandzero, alusrc, regdst, regwrite, zero: STD_LOGIC := '0';
-    signal jump: STD_LOGIC_VECTOR(1 downto 0);
+    signal memtoreg, memwrite, branchandzero, alusrc, regwrite, zero: STD_LOGIC := '0';
+    signal jump, regdst: STD_LOGIC_VECTOR(1 downto 0);
     signal alucontrol: STD_LOGIC_VECTOR(2 downto 0) := "000";
     signal instr: STD_LOGIC_VECTOR(31 downto 0);
 begin
@@ -41,7 +43,8 @@ entity controller is
          zero:                  in STD_LOGIC;
          memtoreg, memwrite:    out STD_LOGIC;
          branchandzero, alusrc: out STD_LOGIC;
-         regdst, regwrite:      out STD_LOGIC;
+         regdst:                out STD_LOGIC_VECTOR(1 downto 0);
+         regwrite:              out STD_LOGIC;
          jump:		            out STD_LOGIC_VECTOR(1 downto 0);
          alucontrol:            out STD_LOGIC_VECTOR(2 downto 0));
 end;
@@ -78,7 +81,7 @@ begin
     end process;
 
     regwrite     <= controls(9);
-    regdst       <= controls(8);
+    regdst       <= controls(8 downto 7); -- TODO: Think again which controls have to be sent.
     alusrc       <= controls(7);
     branch       <= controls(6);
     memwrite     <= controls(5);
@@ -94,7 +97,8 @@ library IEEE; use IEEE.STD_LOGIC_1164.all; use IEEE.NUMERIC_STD.all;
 entity datapath is
     port(clk, reset:        in STD_LOGIC;
          memtoreg, branchandzero:   in STD_LOGIC;
-         alusrc, regdst:    in STD_LOGIC;
+         alusrc:            in STD_LOGIC;
+         regdst:            in STD_LOGIC_VECTOR(1 downto 0);
          regwrite:          in STD_LOGIC;
          jump:              in STD_LOGIC_VECTOR(1 downto 0);
          memwrite:          in STD_LOGIC;
@@ -193,7 +197,7 @@ architecture datapath_architecture of datapath is
     signal immediate: STD_LOGIC_VECTOR(31 downto 0);
     -- Definition of an null address.
     signal emptyaddress: STD_LOGIC_VECTOR(31 downto 0);
-begin -- The definitions below are from left to right on the processor sheet.
+begin -- The definitions below are from left to right on the processor sheedatapatht.
     -- MUX2 most left.
     mux2_1 : mux2 generic map (width => 32) port map(d0 => nextaddress, d1 => result, s => mux4_3_output, y => mux2_1_output);
     -- MUX4 most left.
@@ -210,8 +214,13 @@ begin -- The definitions below are from left to right on the processor sheet.
     signext1 : signext generic map (width_in => 16, width_out => 32) port map (a => instr(15 downto 0), y => immediate);
     -- Shift left below Register File.
     shiftleft1: sl2 port map(a => instr(31 downto 0), y => jumpaddress); -- TODO 31 down to 0 is not right but shift left needs 31 Bits?.
+    -- MUX4 right beside Register File.
+    mux4_2 : mux4 generic map (width => 5) port map(d0 => instr(20 downto 16), d1 => instr(15 downto 11), d2 => std_logic_vector(to_unsigned(31, 5)), d3 => std_logic_vector(to_unsigned(0, 5)), s => regdst, y => destinationreg);
+    -- MUX2 right beside Register File.
+    mux2_2 : mux2 generic map (width => 32) port map(d0 => writedata, d1 => immediate, s => alusrc, y => srcb);
 
-    -- TODO: Continue here from left to write on the processor sheet. Next item is Mux4_2.
+
+
     
     -- ALU.
     alu1 : alu port map(a => srca, b => srcb, alucontrol => alucontrol, zero => zero);

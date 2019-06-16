@@ -76,10 +76,10 @@ begin
             when "101000" => controls <= "--------------"; -- SB
             when "000100" => controls <= "--------------"; -- BEQ
             when "000101" => controls <= "--------------"; -- BNE
-            when "001000" => controls <= "10010000000010"; -- ADDI TODO: Double check. All controls are the wrong way around exept addi.
+            when "001000" => controls <= "10010000000010"; -- ADDI - Correct.
             when "001010" => controls <= "--------------"; -- SLTI
             when "000010" => controls <= "--------------"; -- J
-            when "000011" => controls <= "--------------"; -- JAL
+            when "000011" => controls <= "11000001001000"; -- JAL
             when others   => controls <= "--------------"; -- illegal op
         end case;
     end process;
@@ -243,18 +243,20 @@ begin -- The definitions below are from left to right on the processor sheedatap
     -- DEBUG Helper. Should be removed before submission.
     process begin
         report "Begin #############################################################################################################################################";
-        report "Instruction: " & to_string(instr);
+        report "Instruction: " & to_string(instr) & " PC: " & to_string(pc);
         report "ALU: Input[" & to_string(srca) & "/" & to_string(srcb) & "] Control: " & to_string(alucontrol) & " Result:" & to_string(aluresult);
         report "RESULT: " & to_string(result) & " into " & to_string(destinationreg) ;
         -- report "WriteData: " & to_string(writedata);
         --report "regwrite: " & to_string(regwrite);
        -- report "redgst: " & to_string(regdst);
           report "RegDst: " & to_string(regdst) & " " & to_string(instr(15 downto 11));
+        report "Jump: " & to_string(jump) & " " & to_string(mux4_1_output);
+
    --     report "DesinationReg: " & to_string(destinationreg);
         report "End #############################################################################################################################################";
 
 
-        wait for 250 ps;
+        wait for 5 ps;
     end process;
 
  end;

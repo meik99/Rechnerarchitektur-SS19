@@ -111,7 +111,7 @@ entity datapath is
 end;
 
 
--- TODO: Implement datapath of the MIPS processor
+-- Implement datapath of the MIPS processor
 -- Important: the instance of the component regfile must be named rf. Otherwise, the testbench cannot read out the final results.
 -- Important: the instance of the component dmem must be named dmem1. Otherwise, the testbench cannot read out the final results.
 -- Put all parts together, the controller is already defined above, combine all other contents.
@@ -202,15 +202,13 @@ architecture datapath_architecture of datapath is
     signal branchaddress : STD_LOGIC_VECTOR(31 downto 0);
     -- The immediate coming from sign extend below Register File.
     signal immediate: STD_LOGIC_VECTOR(31 downto 0);
-    -- Definition of an null address.
-    signal emptyaddress: STD_LOGIC_VECTOR(31 downto 0);
     -- Temporary signals for mux 4_3.
     signal tmp1, tmp2: STD_LOGIC_VECTOR(0 downto 0);
 begin -- The definitions below are from left to right on the processor sheedatapatht.
     -- MUX2 most left.
     mux2_1 : mux2 generic map (width => 32) port map(d0 => nextaddress, d1 => branchaddress, s => mux4_3_output, y => mux2_1_output);
     -- MUX4 most left.
-    mux4_1 : mux4 generic map (width => 32) port map(d0 => mux2_1_output, d1 => jumpaddress, d2 => srca, d3 => emptyaddress, s => jump, y => mux4_1_output);
+    mux4_1 : mux4 generic map (width => 32) port map(d0 => mux2_1_output, d1 => jumpaddress, d2 => srca, d3 => std_logic_vector(to_unsigned(0, 32)), s => jump, y => mux4_1_output);
     -- Programm Counter 32 Bit Flip Flop.
     pc1 : ff generic map (width => 32) port map(clk => clk, reset => reset, d => mux4_1_output, q => pc);
     -- Instruction Memory.
@@ -222,7 +220,7 @@ begin -- The definitions below are from left to right on the processor sheedatap
     -- Sign Extend below Register File.
     signext1 : signext generic map (width_in => 16, width_out => 32) port map (a => instr(15 downto 0), y => immediate);
     -- Shift left below Register File.
-    shiftleft1: sl2 port map(a => instr(31 downto 0), y => jumpaddress); -- TODO 31 down to 0 is not right but shift left needs 31 Bits?.
+    shiftleft1: sl2 port map(a => instr(31 downto 0), y => jumpaddress);
     -- MUX4 right beside Register File.
     mux4_2 : mux4 generic map (width => 5) port map(d0 => instr(20 downto 16), d1 => instr(15 downto 11), d2 => std_logic_vector(to_unsigned(31, 5)), d3 => std_logic_vector(to_unsigned(0, 5)), s => regdst, y => destinationreg);
     -- MUX2 right beside Register File.
@@ -240,7 +238,7 @@ begin -- The definitions below are from left to right on the processor sheedatap
     -- Data Memory.
     dmem1: dmem port map(clk => clk, we => memwrite, a => aluresult, wd => writedata, rd => readdata);
     -- MUX4 right beside Data Memory.
-    mux4_4 : mux4 generic map (width => 32) port map(d0 => aluresult, d1 => readdata, d2 => nextaddress, d3 => emptyaddress, s => memtoreg, y => result);   
+    mux4_4 : mux4 generic map (width => 32) port map(d0 => aluresult, d1 => readdata, d2 => nextaddress, d3 => std_logic_vector(to_unsigned(0, 32)), s => memtoreg, y => result);   
 end;
 
 -- testbench

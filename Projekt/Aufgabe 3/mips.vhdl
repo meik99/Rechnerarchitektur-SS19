@@ -10,6 +10,7 @@ architecture struct of mips is
             zero:                   in STD_LOGIC;
             memtoreg:               out STD_LOGIC_VECTOR(1 downto 0);
             memwrite:               out STD_LOGIC;
+            wordOrByte:             out STD_LOGIC;
             branch:                 out STD_LOGIC_VECTOR(1 downto 0);
             alusrc:                 out STD_LOGIC;
             regdst:                 out STD_LOGIC_VECTOR(1 downto 0);
@@ -26,17 +27,18 @@ architecture struct of mips is
             regwrite:          in STD_LOGIC;
             jump:              in STD_LOGIC_VECTOR(1 downto 0);
             memwrite:          in STD_LOGIC;
+            wordOrByte:        in STD_LOGIC;
             alucontrol:        in STD_LOGIC_VECTOR(2 downto 0);
             zero:              out STD_LOGIC;
             instr:             out STD_LOGIC_VECTOR(31 downto 0));
     end component;
-    signal memwrite, alusrc, regwrite, zero: STD_LOGIC := '0';
+    signal memwrite, wordOrByte, alusrc, regwrite, zero: STD_LOGIC := '0';
     signal memtoreg, jump, regdst, branch: STD_LOGIC_VECTOR(1 downto 0);
     signal alucontrol: STD_LOGIC_VECTOR(2 downto 0) := "000";
     signal instr: STD_LOGIC_VECTOR(31 downto 0);
 begin
-    cont: controller port map(instr(31 downto 26), instr(5 downto 0), zero, memtoreg, memwrite, branch, alusrc, regdst, regwrite, jump, alucontrol);
-    dp: datapath port map(clk, reset, memtoreg, branch, alusrc, regdst, regwrite, jump, memwrite, alucontrol, zero, instr);
+    cont: controller port map(instr(31 downto 26), instr(5 downto 0), zero, memtoreg, memwrite, wordOrByte, branch, alusrc, regdst, regwrite, jump, alucontrol);
+    dp: datapath port map(clk, reset, memtoreg, branch, alusrc, regdst, regwrite, jump, memwrite, wordOrByte, alucontrol, zero, instr);
 end;
 
 -- Controller
@@ -46,6 +48,7 @@ entity controller is
     zero:                   in STD_LOGIC;
     memtoreg:               out STD_LOGIC_VECTOR(1 downto 0);
     memwrite:               out STD_LOGIC;
+    wordOrByte:             out STD_LOGIC;
     branch:                 out STD_LOGIC_VECTOR(1 downto 0);
     alusrc:                 out STD_LOGIC;
     regdst:                 out STD_LOGIC_VECTOR(1 downto 0);
@@ -55,40 +58,41 @@ entity controller is
 end;
 
 architecture struct of controller is
-    signal controls: STD_LOGIC_VECTOR(13 downto 0) := "00000000000000";
+    signal controls: STD_LOGIC_VECTOR(14 downto 0) := "000000000000000";
 begin    
     process(op, funct) begin
 		-- TODO: Set controll signals accordingly. Use - to denote don't cares and 0 or 1 if the value is fixed.
         case op is
             when "000000" => -- R-Type
                 case funct is
-                    when "100000" => controls <= "--------------"; -- ADD
-                    when "100010" => controls <= "--------------"; -- SUB
-                    when "100100" => controls <= "--------------"; -- AND
-                    when "100101" => controls <= "--------------"; -- OR
-                    when "101010" => controls <= "--------------"; -- SLT
-                    when "001000" => controls <= "--------------"; -- JR
-                    when others   => controls <= "--------------";
+                    when "100000" => controls <= "1010000-0000010"; -- ADD
+                    when "100010" => controls <= "1010000-0000110"; -- SUB
+                    when "100100" => controls <= "1010000-0000000"; -- AND
+                    when "100101" => controls <= "1010000-0000001"; -- OR
+                    when "101010" => controls <= "1010000-0000111"; -- SLT
+                    when "001000" => controls <= "0---000---10---"; -- JR
+                    when others   => controls <= "---------------";
                 end case;
-            when "100011" => controls <= "--------------"; -- LW
-            when "100000" => controls <= "--------------"; -- LB
-            when "101011" => controls <= "--------------"; -- SW
-            when "101000" => controls <= "--------------"; -- SB
-            when "000100" => controls <= "--------------"; -- BEQ
-            when "000101" => controls <= "--------------"; -- BNE
-            when "001000" => controls <= "10010000000010"; -- ADDI - Correct.
-            when "001010" => controls <= "--------------"; -- SLTI
-            when "000010" => controls <= "--------------"; -- J
-            when "000011" => controls <= "11000001001000"; -- JAL
-            when others   => controls <= "--------------"; -- illegal op
+            when "100011" => controls <= "100100000100010"; -- LW
+            when "100000" => controls <= "100100010100010"; -- LB
+            when "101011" => controls <= "0--10010--00010"; -- SW 
+            when "101000" => controls <= "0--10011--00010"; -- SB
+            when "000100" => controls <= "0--0010---00110"; -- BEQ
+            when "000101" => controls <= "0--0100---00110"; -- BNE
+            when "001000" => controls <= "1001000-0000010"; -- ADDI
+            when "001010" => controls <= "1001000-0000111"; -- SLTI
+            when "000010" => controls <= "0---000---01---"; -- J
+            when "000011" => controls <= "110-000-1001---"; -- JAL  
+            when others   => controls <= "---------------"; -- illegal op
         end case;
     end process;
 
-    regwrite     <= controls(13);
-    regdst       <= controls(12 downto 11); 
-    alusrc       <= controls(10);
-    branch       <= controls(9 downto 8); 
-    memwrite     <= controls(7);
+    regwrite     <= controls(14);
+    regdst       <= controls(13 downto 12); 
+    alusrc       <= controls(11);
+    branch       <= controls(10 downto 9); 
+    memwrite     <= controls(8);
+    wordOrByte   <= controls(7);
     memtoreg     <= controls(6 downto 5);
     jump         <= controls(4 downto 3);
     alucontrol   <= controls(2 downto 0); -- 000-AND, 001-OR, 010-ADD, 110-SUBSTRACT, 111-SETONLESSTHAN.
@@ -105,6 +109,7 @@ entity datapath is
          regwrite:          in STD_LOGIC;
          jump:              in STD_LOGIC_VECTOR(1 downto 0);
          memwrite:          in STD_LOGIC;
+         wordOrByte:        in STD_LOGIC;
          alucontrol:        in STD_LOGIC_VECTOR(2 downto 0);
          zero:              out STD_LOGIC;
          instr:             out STD_LOGIC_VECTOR(31 downto 0));
@@ -182,7 +187,7 @@ architecture datapath_architecture of datapath is
     signal writedata : STD_LOGIC_VECTOR(31 downto 0);
     -- The aluresult coming from the ALU.
     signal aluresult : STD_LOGIC_VECTOR(31 downto 0);
-    -- The readdata coming from the Data Memory.
+    -- The readdata (always whole word) coming from the Data Memory.
     signal readdata : STD_LOGIC_VECTOR(31 downto 0);
     -- The programm counter coming from the PC flip flop memory.
     signal pc : STD_LOGIC_VECTOR(31 downto 0);
@@ -204,11 +209,19 @@ architecture datapath_architecture of datapath is
     signal immediate: STD_LOGIC_VECTOR(31 downto 0);
     -- Temporary signals for mux 4_3.
     signal tmp1, tmp2: STD_LOGIC_VECTOR(0 downto 0);
+    -- The single byte loaded for the load byte command
+    signal loadbyte: STD_LOGIC_VECTOR(7 downto 0);
+    -- The single byte extracted from the address for write byte
+    signal writedataByte: STD_LOGIC_VECTOR(31 downto 0);
+    -- Either writedata or writedataByte, depending in wordOrByte control flag
+    signal writedataValue: STD_LOGIC_VECTOR(31 downto 0);
+    -- Either a whole word or a single byte from the data memory.
+    signal readdataresult : STD_LOGIC_VECTOR(31 downto 0);
 begin -- The definitions below are from left to right on the processor sheedatapatht.
     -- MUX2 most left.
     mux2_1 : mux2 generic map (width => 32) port map(d0 => nextaddress, d1 => branchaddress, s => mux4_3_output, y => mux2_1_output);
     -- MUX4 most left.
-    mux4_1 : mux4 generic map (width => 32) port map(d0 => mux2_1_output, d1 => jumpaddress, d2 => srca, d3 => std_logic_vector(to_unsigned(0, 32)), s => jump, y => mux4_1_output);
+    mux4_1 : mux4 generic map (width => 32) port map(d0 => mux2_1_output, d1 => jumpaddress, d2 => srca, d3 => srca, s => jump, y => mux4_1_output);
     -- Programm Counter 32 Bit Flip Flop.
     pc1 : ff generic map (width => 32) port map(clk => clk, reset => reset, d => mux4_1_output, q => pc);
     -- Instruction Memory.
@@ -220,44 +233,33 @@ begin -- The definitions below are from left to right on the processor sheedatap
     -- Sign Extend below Register File.
     signext1 : signext generic map (width_in => 16, width_out => 32) port map (a => instr(15 downto 0), y => immediate);
     -- Shift left below Register File.
-    shiftleft1: sl2 port map(a => instr(31 downto 0), y => jumpaddress);
+    shiftleft1: sl2 port map(a => (31 downto 26 => '0') & instr(25 downto 0), y => jumpaddress);    -- don't use the whole instruction here, as this would also contain the op code, only the last 26 bits are the address
     -- MUX4 right beside Register File.
     mux4_2 : mux4 generic map (width => 5) port map(d0 => instr(20 downto 16), d1 => instr(15 downto 11), d2 => std_logic_vector(to_unsigned(31, 5)), d3 => std_logic_vector(to_unsigned(0, 5)), s => regdst, y => destinationreg);
     -- MUX2 right beside Register File.
     mux2_2 : mux2 generic map (width => 32) port map(d0 => writedata, d1 => immediate, s => alusrc, y => srcb);
     -- ALU.
     alu1 : alu port map(a => srca, b => srcb, alucontrol => alucontrol, zero => zero, result => aluresult);
-    -- Shift left below ALU.
-    shiftLeft2: signext generic map (width_in => 32, width_out => 32) port map (a => immediate, y => shiftLeft2_output);
+    -- Shift left below Register file.
+    shiftLeft2: sl2 port map(a => immediate, y => shiftLeft2_output);
     -- Adder below ALU.
     adder2: adder port map(a => shiftLeft2_output, b => nextaddress, cin => '0', y => branchaddress);
     -- MUX4 above Data Memory.
     tmp1(0) <= zero;
     tmp2(0) <= NOT zero; 
     mux4_3 : mux4 generic map (width => 1) port map(d0 => std_logic_vector(to_unsigned(0, 1)), d1 => tmp1, d2 => tmp2, d3 => std_logic_vector(to_unsigned(0, 1)), s => branch, y(0) => mux4_3_output);
+    -- write data mux
+    mux4_4: mux4 generic map (width => 32) port map(d0 => readdata(31 downto 8) & writedata(7 downto 0), d1 => readdata(31 downto 16) & writedata(7 downto 0) & readdata(7 downto 0), d2 => readdata(31 downto 24) & writedata(7 downto 0) & readdata(15 downto 0), d3 => writedata(7 downto 0) & readdata(23 downto 0), s => aluresult(1 downto 0), y => writedataByte);
+    -- mux to select whether or not the write the whole word or only a single byte
+    mux2_3: mux2 generic map(width => 32) port map(d0 => writedata, d1 => writedataByte, s => wordOrByte, y => writedataValue);
     -- Data Memory.
-    dmem1: dmem port map(clk => clk, we => memwrite, a => aluresult, wd => writedata, rd => readdata);
-    -- MUX4 right beside Data Memory.
-    mux4_4 : mux4 generic map (width => 32) port map(d0 => aluresult, d1 => readdata, d2 => nextaddress, d3 => std_logic_vector(to_unsigned(0, 32)), s => memtoreg, y => result);   
-    
-    -- DEBUG Helper. Should be removed before submission.
-    process begin
-        report "Begin #############################################################################################################################################";
-        report "Instruction: " & to_string(instr) & " PC: " & to_string(pc);
-        report "ALU: Input[" & to_string(srca) & "/" & to_string(srcb) & "] Control: " & to_string(alucontrol) & " Result:" & to_string(aluresult);
-        report "RESULT: " & to_string(result) & " into " & to_string(destinationreg) ;
-        -- report "WriteData: " & to_string(writedata);
-        --report "regwrite: " & to_string(regwrite);
-       -- report "redgst: " & to_string(regdst);
-          report "RegDst: " & to_string(regdst) & " " & to_string(instr(15 downto 11));
-        report "Jump: " & to_string(jump) & " " & to_string(mux4_1_output);
-
-   --     report "DesinationReg: " & to_string(destinationreg);
-        report "End #############################################################################################################################################";
-
-
-        wait for 5 ps;
-    end process;
+    dmem1: dmem port map(clk => clk, we => memwrite, a => aluresult, wd => writedataValue, rd => readdata);
+    -- MUX4 selecting a single byte from the read data memory, the byte that gets selected is in the last two bits of the address (alu result)
+    mux4_5: mux4 generic map (width => 8) port map(d0 => readdata(7 downto 0), d1 => readdata(15 downto 8), d2 => readdata(23 downto 16), d3 => readdata(31 downto 24), s => aluresult(1 downto 0), y => loadbyte);
+    -- MUX2 selecting if a whole word or a single byte should be read
+    mux2_4: mux2 generic map(width => 32) port map(d0 => readdata, d1 => (31 downto 8 => '0') & loadbyte, s => wordOrByte, y => readdataresult);
+    -- MUX4 the one at the very right (near Data Memory).
+    mux4_6 : mux4 generic map (width => 32) port map(d0 => aluresult, d1 => readdataresult, d2 => nextaddress, d3 => (31 downto 1 => '0') & aluresult(31), s => memtoreg, y => result);   
 
  end;
 

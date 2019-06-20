@@ -1,35 +1,35 @@
-20040100 - addi $4, $0, 256   - 001000 00000 00100 0000000100000000   - ITYPE(Op code, R0, R4, Number 256) // Load address 0x100 (256) into R4. Address 0.
-0c000005 - jal 0x5            - 000011 00000000000000000000000101     - JTYPE(Op code, 26 Bit Address) // Jump to the 5th Address
-00408020 - add $16, $2, $0    - 000000 00010 00000 10000 00000 100000 - RTYPE(Op code=0, R2, R0, R16, 0 SHIFT, Op-Function)
-2002000a - addi $2, $0, 10    - 001000 00000 00010 0000000000001010   - ITYPE(Op code, R0, R2, Number 10)
-0000000c - syscall            - 00000000000000000000000000001100      - SYSTEMCALL OP code.
-23bdfffc - addi $29, $29, -4  - 001000 11101 11101 1111111111111100   - ITYPE(Op code, R29, R29, 2er Complement 4) // Address 5.
-afbe0000 - sw $30, 0($29)     - 101011 11101 11110 0000000000000000   - ITYPE(Op code, R29, R30, 0)
-23be0004 - addi $30, $29, 4   - 001000 11101 11110 0000000000000100   - ITYPE(Op code, R29, R30, Number 4)
-20080000 - addi $8, $0, 0     - 001000 00000 01000 0000000000000000   - ITYPE(Op code, R0, R8, Number 0)
-20090001 - addi $9, $0, 1     - 001000 00000 01001 0000000000000001   - ITYPE(Op code, R0, R9, Number 1)
-808a0000 - lb $10, 0($4)      - 100000 00100 01010 0000000000000000   - ITYPE(Op code, R4, R10, Number 0) // loop. Address 10.
-11400012 - beq $10, $0, 75    - 000100 01010 00000 0000000000010010   - ITYPE(Op code, R10, R0, Number 19-1) // Relative address to endloop.
-11200008 - beq $9, $0, 35     - 000100 01001 00000 0000000000001000   - ITYPE(Op code, R9, R0, Number 9-1) // Relative address to else1.
-294b0061 - slti $11, $10, 97  - 001010 01010 01011 0000000001100001   - ITYPE(Op code, R10, R11, Number 97)
-15600006 - bne $11, $0, 27    - 000101 01011 00000 0000000000000110   - ITYPE(Op code, R11, R0, Number 7-1) // Relative address to else1.
-294b007b - slti $11, $10, 123 - 001010 01010 01011 0000000001111011   - ITYPE(Op code, R10, R11, Number 123)
-11600004 - beq $11, $0, 19    - 000100 01011 00000 0000000000000100   - ITYPE(Op code, R11, R0, Number 5-1) // Relative address to else1.
-214affe0 - addi $10, $10, -32 - 001000 01010 01010 1111111111100000   - ITYPE(Op code, R10, R10, 2er Complement 32)
-a08a0000 - sb $10, 0($4)      - 101000 00100 01010 0000000000000000   - ITYPE(Op code, R4, R10, 0)
-20090000 - addi $9, $0, 0     - 001000 00000 01001 0000000000000000   - ITYPE(Op code, R0, R9, Number 0)
-0800001e - j 0x1E             - 000010 00000000000000000000011110     - JTYPE(Op code, 26 Bit Address) // Jump to address 30
-200b0020 - addi $11, $0, 32   - 001000 00000 01011 0000000000100000   - ITYPE(Op code, R0, R11, Number 32) // else1.
-154b0004 - bne $10, $11, 19   - 000101 01010 01011 0000000000000100   - ITYPE(Op code, R10, R11, Number 5-1) //  Relative address to else2.
-21080001 - addi $8, $8, 1     - 001000 01000 01000 0000000000000001   - ITYPE(Op code, R8, R8, Number 1)
-01094022 - sub $8, $8, $9     - 000000 01000 01001 01000 00000 100010 - RTYPE(Op code=0, R8, R9, R8, 0 SHIFT, Op-Function)
-20090001 - addi $9, $0, 1     - 001000 00000 01001 0000000000000001   - ITYPE(Op code, R0, R9, Number 1)
-0800001c - j 0x1C             - 000010 00000000000000000000011100     - JTYPE(Op code, 26 Bit Address) // Jump to address 28.
-20090000 - addi $9, $0, 0     - 001000 00000 01001 0000000000000000   - ITYPE(Op code, R0, R9, Number 0) // else2.
-20840001 - addi $4, $4, 1     - 001000 00100 00100 0000000000000001   - ITYPE(Op code, R4, R4, Number 1) // endif1. Address 28.
-0800000a - j 0xA              - 000010 00000000000000000000001010     - JTYPE(Op code, 26 Bit Address) // Jump to address 10.
-21080001 - addi $8, $8, 1     - 001000 01000 01000 0000000000000001   - ITYPE(Op code, R8, R8, Number 1)   // Endloop. Address 30.
-01091022 - sub $2, $8, $9     - 000000 01000 01001 00010 00000 100010 - RTYPE(Op code=0, R8, R9, R2, 0 SHIFT, Op-Function)
-8fbe0000 - lw $30, 0($29)     - 100011 11101 11110 0000000000000000   - ITYPE(Op code, R29, R30, 0)
-23bd0004 - addi $29, $29, 4   - 001000 11101 11101 0000000000000100   - ITYPE(Op code, R29, R29, Number 4)
-03e00008 - jr $31             - 000000 11111 00000 00000 00000 001000 - RTYPE(Op code=0, R31, 0, 0, 0 SHIFT, Op-Function)
+20040100 - addi $4, $0, 256   - 001000 00000 00100 0000000100000000   - 0    ITYPE(Op code, R0, R4, Number 256) // Load address 0x100 (256) into R4. Address 0.
+0c000005 - jal 0x5            - 000011 00000000000000000000000101     - 4    JTYPE(Op code, 26 Bit Address) // Jump to the 5th Address
+00408020 - add $16, $2, $0    - 000000 00010 00000 10000 00000 100000 - 8    RTYPE(Op code=0, R2, R0, R16, 0 SHIFT, Op-Function)
+2002000a - addi $2, $0, 10    - 001000 00000 00010 0000000000001010   - 12   ITYPE(Op code, R0, R2, Number 10)
+0000000c - syscall            - 00000000000000000000000000001100      - 16   SYSTEMCALL OP code.
+23bdfffc - addi $29, $29, -4  - 001000 11101 11101 1111111111111100   - 20   ITYPE(Op code, R29, R29, 2er Complement 4) // Address 5.
+afbe0000 - sw $30, 0($29)     - 101011 11101 11110 0000000000000000   - 24   ITYPE(Op code, R29, R30, 0)
+23be0004 - addi $30, $29, 4   - 001000 11101 11110 0000000000000100   - 28   ITYPE(Op code, R29, R30, Number 4)
+20080000 - addi $8, $0, 0     - 001000 00000 01000 0000000000000000   - 32   ITYPE(Op code, R0, R8, Number 0)
+20090001 - addi $9, $0, 1     - 001000 00000 01001 0000000000000001   - 36   ITYPE(Op code, R0, R9, Number 1)
+808a0000 - lb $10, 0($4)      - 100000 00100 01010 0000000000000000   - 40   ITYPE(Op code, R4, R10, Number 0) // loop. Address 10.
+11400012 - beq $10, $0, 18    - 000100 01010 00000 0000000000010010   - 44   ITYPE(Op code, R10, R0, Number 19-1) // Relative address to endloop.
+11200008 - beq $9, $0, 8      - 000100 01001 00000 0000000000001000   - 48   ITYPE(Op code, R9, R0, Number 9-1) // Relative address to else1.
+294b0061 - slti $11, $10, 97  - 001010 01010 01011 0000000001100001   - 52   ITYPE(Op code, R10, R11, Number 97)
+15600006 - bne $11, $0, 6     - 000101 01011 00000 0000000000000110   - 56   ITYPE(Op code, R11, R0, Number 7-1) // Relative address to else1.
+294b007b - slti $11, $10, 123 - 001010 01010 01011 0000000001111011   - 60   ITYPE(Op code, R10, R11, Number 123)
+11600004 - beq $11, $0, 8     - 000100 01011 00000 0000000000000100   - 64   ITYPE(Op code, R11, R0, Number 5-1) // Relative address to else1.
+214affe0 - addi $10, $10, -32 - 001000 01010 01010 1111111111100000   - 68   ITYPE(Op code, R10, R10, 2er Complement 32)
+a08a0000 - sb $10, 0($4)      - 101000 00100 01010 0000000000000000   - 72   ITYPE(Op code, R4, R10, 0)
+20090000 - addi $9, $0, 0     - 001000 00000 01001 0000000000000000   - 76   ITYPE(Op code, R0, R9, Number 0)
+0800001c - j 0x1C             - 000010 00000000000000000000011100     - 80   JTYPE(Op code, 26 Bit Address) // Jump to address 30
+200b0020 - addi $11, $0, 32   - 001000 00000 01011 0000000000100000   - 84   ITYPE(Op code, R0, R11, Number 32) // else1.
+154b0004 - bne $10, $11, 8    - 000101 01010 01011 0000000000000100   - 88   ITYPE(Op code, R10, R11, Number 5-1) //  Relative address to else2.
+21080001 - addi $8, $8, 1     - 001000 01000 01000 0000000000000001   - 92   ITYPE(Op code, R8, R8, Number 1)
+01094022 - sub $8, $8, $9     - 000000 01000 01001 01000 00000 100010 - 96   RTYPE(Op code=0, R8, R9, R8, 0 SHIFT, Op-Function)
+20090001 - addi $9, $0, 1     - 001000 00000 01001 0000000000000001   - 100  ITYPE(Op code, R0, R9, Number 1)
+0800001c - j 0x1C             - 000010 00000000000000000000011100     - 104  JTYPE(Op code, 26 Bit Address) // Jump to address 28.
+20090000 - addi $9, $0, 0     - 001000 00000 01001 0000000000000000   - 108  ITYPE(Op code, R0, R9, Number 0) // else2.
+20840001 - addi $4, $4, 1     - 001000 00100 00100 0000000000000001   - 112  ITYPE(Op code, R4, R4, Number 1) // endif1. Address 28.
+0800000a - j 0xA              - 000010 00000000000000000000001010     - 116  JTYPE(Op code, 26 Bit Address) // Jump to address 10.
+21080001 - addi $8, $8, 1     - 001000 01000 01000 0000000000000001   - 120  ITYPE(Op code, R8, R8, Number 1)   // Endloop. Address 30.
+01091022 - sub $2, $8, $9     - 000000 01000 01001 00010 00000 100010 - 124  RTYPE(Op code=0, R8, R9, R2, 0 SHIFT, Op-Function)
+8fbe0000 - lw $30, 0($29)     - 100011 11101 11110 0000000000000000   - 128  ITYPE(Op code, R29, R30, 0)
+23bd0004 - addi $29, $29, 4   - 001000 11101 11101 0000000000000100   - 132  ITYPE(Op code, R29, R29, Number 4)
+03e00008 - jr $31             - 000000 11111 00000 00000 00000 001000 - 136  RTYPE(Op code=0, R31, 0, 0, 0 SHIFT, Op-Function)

@@ -259,7 +259,7 @@ begin -- The definitions below are from left to right on the processor sheedatap
     -- MUX2 selecting if a whole word or a single byte should be read
     mux2_4: mux2 generic map(width => 32) port map(d0 => readdata, d1 => (31 downto 8 => '0') & loadbyte, s => wordOrByte, y => readdataresult);
     -- MUX4 the one at the very right (near Data Memory).
-    mux4_6 : mux4 generic map (width => 32) port map(d0 => aluresult, d1 => readdataresult, d2 => nextaddress, d3 => (31 downto 1 => '0') & aluresult(31), s => memtoreg, y => result);   
+    mux4_6 : mux4 generic map (width => 32) port map(d0 => aluresult, d1 => readdataresult, d2 => nextaddress, d3 => (31 downto 0 => '0'), s => memtoreg, y => result);   
 
  end;
 
